@@ -1,0 +1,76 @@
+{
+  "name": "totea",
+  "version": "1.0.0",
+  "description": "Express CRUD for RESTful APIs",
+  "author": "aimleo",
+  "license": "MIT",
+  "main": "src/index.js",
+  "files": [
+    "src/",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "crud",
+    "totea",
+    "totea-cli"
+  ],
+  "engines": {
+    "node": ">=10.x",
+    "npm": ">= 6.x"
+  },
+  "browserslist": [
+    "maintained node versions"
+  ],
+  "scripts": {
+    "cm": "npx git-cz",
+    "release": "standard-version && npm run pub",
+    "release:d": "standard-version",
+    "release:m": "standard-version --release-as minor && npm run pub",
+    "release:md": "standard-version --release-as minor --dry-run",
+    "pub": "git push --follow-tags origin master && npm publish"
+  },
+  "dependencies": {
+    "cookie-parser": "~1.4.3",
+    "cors": "^2.8.5",
+    "deepmerge": "^4.2.2",
+    "express": "~4.16.0",
+    "express-async-errors": "^3.1.1",
+    "fastest-validator": "^0.6.17",
+    "fs-extra": "^9.0.1",
+    "http-errors": "~1.6.2",
+    "import-modules": "^2.0.0",
+    "md5": "^2.2.1",
+    "mongoose": "^5.3.15",
+    "morgan": "~1.9.0",
+    "multer": "^1.4.2",
+    "resize-img": "^2.0.0"
+  },
+  "devDependencies": {
+    "git-cz": "^4.3.1",
+    "husky": "^4.2.3",
+    "prettier": "^2.0.2",
+    "pretty-quick": "^2.0.1",
+    "standard-version": "^7.1.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  }
+}

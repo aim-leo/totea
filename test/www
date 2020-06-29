@@ -1,0 +1,17 @@
+#!/usr/bin/env node
+global.ROOT = __dirname
+
+const { ToTeaServer } = require('../src')
+
+class Server extends ToTeaServer{
+  customizeRouter(router) {
+    router.use('/', (req, res, next) => {
+      res.send('totea server is running!')
+    })
+  }
+}
+
+new Server({
+  mongoUri: 'mongodb://localhost:27017/totea',
+  port: 3000
+})
