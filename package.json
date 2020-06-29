@@ -1,6 +1,6 @@
 {
   "name": "totea",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Express CRUD for RESTful APIs",
   "author": "aimleo",
   "license": "MIT",
@@ -26,6 +26,10 @@
   "browserslist": [
     "maintained node versions"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://git@github.com:aim-leo/totea.git"
+  },
   "scripts": {
     "cm": "npx git-cz",
     "release": "standard-version && npm run pub",
