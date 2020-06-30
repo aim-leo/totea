@@ -1,6 +1,6 @@
 {
   "name": "totea",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "Express CRUD for RESTful APIs",
   "author": "aimleo",
   "license": "MIT",
@@ -34,10 +34,10 @@
     "cm": "npx git-cz",
     "release": "standard-version && npm run pub",
     "release:d": "standard-version",
-    "release:m": "standard-version --release-as minor && npm run pub && npm run pub:github",
+    "release:m": "standard-version --release-as minor && npm run push && npm run pub2npm",
     "release:md": "standard-version --release-as minor --dry-run",
-    "pub": "git push --follow-tags origin master && npm publish",
-    "pub:github": "git push --follow-tags github master && npm publish",
+    "push": "git push --follow-tags origin master && git push --follow-tags github master",
+    "pub2npm": "nrm use npm && npm publish",
     "test": "node test/www"
   },
   "dependencies": {
