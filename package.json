@@ -32,8 +32,8 @@
   },
   "scripts": {
     "cm": "npx git-cz",
-    "release": "standard-version && npm run pub",
-    "release:d": "standard-version",
+    "release": "standard-version && npm run push && npm run pub2npm",
+    "release:d": "standard-version --dry-run",
     "release:m": "standard-version --release-as minor && npm run push && npm run pub2npm",
     "release:md": "standard-version --release-as minor --dry-run",
     "push": "git push --follow-tags origin master && git push --follow-tags github master",
