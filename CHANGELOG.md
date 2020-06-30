@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.7.1](https://github.com/aim-leo/totea/compare/v1.7.0...v1.7.1) (2020-06-30)
+
+
+### Bug Fixes
+
+* 🐛 createServer error ([0ae2269](https://github.com/aim-leo/totea/commit/0ae22697519eedaa816ddb8f0b97bce4846a202f))
+
 ## [1.7.0](https://github.com/aim-leo/totea/compare/v1.6.0...v1.7.0) (2020-06-30)
 
 ## [1.6.0](https://github.com/aim-leo/totea/compare/v1.5.0...v1.6.0) (2020-06-30)
