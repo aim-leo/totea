@@ -152,7 +152,7 @@ class ToteaServer {
 }
 
 function createServer(...args) {
-  const server = new ToTeaServer(...args)
+  const server = new ToteaServer(...args)
 
   return server
 }
