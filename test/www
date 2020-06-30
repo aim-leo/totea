@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 global.ROOT = __dirname
 
-const { ToTeaServer } = require('../src')
+const { ToteaServer } = require('../src')
 
-class Server extends ToTeaServer{
+class Server extends ToteaServer{
   customizeRouter(router) {
-    router.use('/', (req, res, next) => {
+    router.get('/', (req, res, next) => {
       res.send('totea server is running!')
     })
   }

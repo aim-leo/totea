@@ -8,7 +8,7 @@ const logger = require('morgan')
 
 const { isNumber, isString } = require('./helper')
 
-class ToTeaServer {
+class ToteaServer {
   constructor({ mongoUri, port = 3000 } = {}) {
     // set db uri
     if (mongoUri) {
@@ -30,7 +30,6 @@ class ToTeaServer {
      */
   
     function onError(error) {
-      console.log(error)
       if (error.syscall !== 'listen') {
         throw error
       }
@@ -159,6 +158,6 @@ function createServer(...args) {
 }
 
 module.exports = {
-  ToTeaServer,
+  ToteaServer,
   createServer
 }

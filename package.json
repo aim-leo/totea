@@ -4,7 +4,7 @@
   "description": "Express CRUD for RESTful APIs",
   "author": "aimleo",
   "license": "MIT",
-  "main": "src/index.js",
+  "main": "src/",
   "files": [
     "src/",
     "README.md",
@@ -34,9 +34,11 @@
     "cm": "npx git-cz",
     "release": "standard-version && npm run pub",
     "release:d": "standard-version",
-    "release:m": "standard-version --release-as minor && npm run pub",
+    "release:m": "standard-version --release-as minor && npm run pub && npm run pub:github",
     "release:md": "standard-version --release-as minor --dry-run",
-    "pub": "git push --follow-tags origin master && npm publish"
+    "pub": "git push --follow-tags origin master && npm publish",
+    "pub:github": "git push --follow-tags github master && npm publish",
+    "test": "node test/www"
   },
   "dependencies": {
     "cookie-parser": "~1.4.3",
