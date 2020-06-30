@@ -4,9 +4,9 @@
   "description": "Express CRUD for RESTful APIs",
   "author": "aimleo",
   "license": "MIT",
-  "main": "src/",
+  "main": "index.js",
   "files": [
-    "src/",
+    "./*.js",
     "README.md",
     "CHANGELOG.md",
     "LICENSE"

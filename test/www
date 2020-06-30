@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 global.ROOT = __dirname
 
-const { ToteaServer } = require('../src')
+const { ToteaServer } = require('../index')
 
 class Server extends ToteaServer{
   customizeRouter(router) {

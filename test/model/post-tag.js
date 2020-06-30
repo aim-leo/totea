@@ -1,5 +1,5 @@
-const Model = require('../../src/model')
-const types = require('../../src/types')
+const Model = require('../../model')
+const types = require('../../types')
 
 const ToteaGroup = types.ToteaGroup
 
