@@ -5,12 +5,6 @@
   "author": "aimleo",
   "license": "MIT",
   "main": "index.js",
-  "files": [
-    "./*.js",
-    "README.md",
-    "CHANGELOG.md",
-    "LICENSE"
-  ],
   "publishConfig": {
     "access": "public"
   },
