@@ -39,6 +39,7 @@ class Totea {
     this._computedFn = null
 
     this._cate = undefined
+    this._formCate = undefined
     this._validator = []
   }
 
@@ -276,6 +277,10 @@ class Totea {
     this._computedFn = fn
 
     return this
+  }
+
+  formCate(cate) {
+    this._formCate = cate
   }
 
   // countModel(modelName, filter = {}) {
@@ -682,10 +687,10 @@ const number = name => new Totea().number().name(name)
 
 const int = name => number(name).min(0)
 
-const date = name => new Totea().date().cate('cate').name(name)
+const date = name => new Totea().date().cate('date').name(name)
 
 const dateNow = name =>
-  new Totea().date().cate('cate').default(Date.now).name(name)
+  new Totea().date().cate('date').default(Date.now).name(name)
 
 const createTime = (name = '创建时间') => dateNow(name)
 
@@ -693,11 +698,11 @@ const updateTime = (name = '创建时间') => dateNow(name).cate('updateTime')
 
 const image = name => text(name).cate('image')
 
-const enums = (values, name) => new Totea().name(name).enum(values)
+const enums = (values, name) => new Totea().name(name).enum(values).cate('enums')
 
 const boolean = name => new Totea().boolean().name(name)
 
-const array = (childType, name) => new Totea().array(childType).name(name)
+const array = (childType, name) => new Totea().array(childType).name(name).cate('array')
 
 const ids = (refName, name, msg) =>
   array({ type: ObjectId, ref: refName }, null, msg).ref(refName).cate('id').name(name)
