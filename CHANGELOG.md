@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.8.0](https://github.com/aim-leo/totea/compare/v1.7.3...v1.8.0) (2020-07-09)
+
+
+### Features
+
+* 🎸 add formCate ([a7e10c5](https://github.com/aim-leo/totea/commit/a7e10c57d8a5c9f39b7d0f325b502cdc46865632))
+
 ### [1.7.3](https://github.com/aim-leo/totea/compare/v1.7.2...v1.7.3) (2020-06-30)
 
 ### [1.7.2](https://github.com/aim-leo/totea/compare/v1.7.1...v1.7.2) (2020-06-30)
