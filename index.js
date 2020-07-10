@@ -1,11 +1,11 @@
 const http = require('http')
-const express = require('express')
 const path = require('path')
 
 const createError = require('http-errors')
 const cookieParser = require('cookie-parser')
 const logger = require('morgan')
 
+const express = require('./express')
 const { isNumber, isString } = require('./helper')
 
 class ToteaServer {
@@ -68,9 +68,10 @@ class ToteaServer {
 
   createApp(router) {
     const app = express()
-  
-    // to catch global error, it will throw a 500 internet error
-    require('express-async-errors')
+
+    // if env is develop, cors
+    const { cors } = require('./middleware')
+    app.use(cors)
   
     app.use(logger('tiny'))
     app.use(express.json())
@@ -100,7 +101,9 @@ class ToteaServer {
   createRouter() {
     const router = express.Router()
 
-    this.registerToTeaRouter(router)
+    this.guradRouter(router)
+
+    this.registerToteaRouter(router)
 
     this.customizeRouter(router)
   
@@ -121,25 +124,24 @@ class ToteaServer {
     app.use('/', router)
   }
 
-  registerToTeaRouter(router) {
-    const { cors } = require('./middleware')
-  
+  registerToteaRouter(router) {
     const ToteaRoute = require('./route')
   
     const toteaRoute = new ToteaRoute({
       src: global.ROOT,
-      router,
-      interceptors: [cors]
+      router
     })
   
     toteaRoute.injectModel()
 
-    this.customizeToTeaRouter(toteaRoute)
+    this.customizeToteaRouter(toteaRoute)
   }
+
+  guradRouter() {}
 
   customizeRouter() {}
 
-  customizeToTeaRouter() {}
+  customizeToteaRouter() {}
 
   setMongoUri(uri) {
     if (!isString(uri)) {

@@ -10,7 +10,7 @@ class Server extends ToteaServer{
     })
   }
 
-  customizeToTeaRouter(toteaRoute) {
+  customizeToteaRouter(toteaRoute) {
     toteaRoute.injectUpload(['image'])
   }
 }

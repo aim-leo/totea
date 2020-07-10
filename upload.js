@@ -1,10 +1,10 @@
-const express = require('express')
 const fs = require('fs-extra')
 const path = require('path')
 const multer = require('multer')
 const md5 = require('md5')
 const resizer = require('resize-img')
 
+const express = require('./express')
 const {
   isString,
   isFunc,

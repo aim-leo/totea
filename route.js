@@ -1,8 +1,8 @@
-const express = require('express')
 const importModules = require('import-modules')
 const path = require('path')
 const merge = require('deepmerge')
 
+const express = require('./express')
 const { isString, isObject, isFunc, isArray, readFileList } = require('./helper')
 
 const ToteaService = require('./service')

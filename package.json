@@ -32,7 +32,7 @@
     "release:md": "standard-version --release-as minor --dry-run",
     "push": "git push --follow-tags origin master && git push --follow-tags github master",
     "pub2npm": "nrm use npm && npm publish",
-    "test": "node test/www"
+    "test": "export NODE_ENV=development && node test/www"
   },
   "dependencies": {
     "cookie-parser": "~1.4.3",
