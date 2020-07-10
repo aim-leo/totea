@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.9.0](https://github.com/aim-leo/totea/compare/v1.8.2...v1.9.0) (2020-07-10)
+
+
+### Features
+
+* 🎸 enable add multi hooks for doiGroup ([994e5ce](https://github.com/aim-leo/totea/commit/994e5ceb4090e62f3cadda22894fe02790fe33ea))
+* 🎸 support async computed ([d16ab7c](https://github.com/aim-leo/totea/commit/d16ab7c41602734d75da050c4ccef074ba501dae))
+
 ### [1.8.2](https://github.com/aim-leo/totea/compare/v1.8.1...v1.8.2) (2020-07-10)
 
 
