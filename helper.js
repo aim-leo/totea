@@ -61,6 +61,14 @@ function isNil(...objs) {
   return objs.every(obj => inType(obj, [undefined, null]))
 }
 
+function isFunction(...objs) {
+  return objs.every(obj => isType(obj, () => {}))
+}
+
+function isAsyncFunction(...objs) {
+  return objs.every(obj => isType(obj, async () => {}))
+}
+
 function isFunc(...objs) {
   return objs.every(obj => inType(obj, [() => {}, async () => {}]))
 }
@@ -214,6 +222,8 @@ module.exports = {
   isArray,
   isBoolean,
   isFunc,
+  isFunction,
+  isAsyncFunction,
   isNaN,
   isNil,
   isNumber,

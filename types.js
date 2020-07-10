@@ -8,11 +8,13 @@ const {
   isReg,
   isString,
   isFunc,
+  isFunction,
+  isAsyncFunction,
   isBoolean,
   isObject,
   isArray,
   removeEmpty,
-  defineEnumerablePropertry
+  defineEnumerablePropertry,
 } = require("./helper");
 
 const validator = require("./validator");
@@ -339,13 +341,6 @@ class Totea {
       default: this._default,
     };
 
-    if (this._computedFn) {
-      const THIS = this;
-      result.get = function () {
-        return THIS._computedFn(this);
-      };
-    }
-
     return removeEmpty(result);
   }
 
@@ -354,7 +349,7 @@ class Totea {
     const result = {
       label: this._name,
       cate: this._formType || "input",
-      attrs: {}
+      attrs: {},
     };
 
     if (this._ref) {
@@ -369,15 +364,15 @@ class Totea {
         callback: this._ref,
       };
 
-      delete result.childs
+      delete result.childs;
     }
 
     if (!isUndef(this._min)) {
-      result.attrs.min = this._min
+      result.attrs.min = this._min;
     }
 
     if (!isUndef(this._max)) {
-      result.attrs.max = this._max
+      result.attrs.max = this._max;
     }
 
     return removeEmpty(result);
@@ -472,7 +467,14 @@ class ToteaGroup {
   constructor(tree) {
     this.tree = tree;
 
-    this._mappingHooks('beforeCreate', 'afterCreate', 'beforeUpdate', 'afterUpdate', 'beforeDelete', 'afterDelete')
+    this._mappingHooks(
+      "beforeCreate",
+      "afterCreate",
+      "beforeUpdate",
+      "afterUpdate",
+      "beforeDelete",
+      "afterDelete"
+    );
   }
 
   get refDbList() {
@@ -507,6 +509,16 @@ class ToteaGroup {
     return this.toUpdateFormShema();
   }
 
+  beforeCreateOrUpdate(...args) {
+    this.beforeCreate(...args);
+    this.beforeUpdate(...args);
+  }
+
+  afterCreateOrUpdate(...args) {
+    this.afterCreate(...args);
+    this.afterUpdate(...args);
+  }
+
   toCreateJson() {
     return this._toJson(true);
   }
@@ -526,6 +538,21 @@ class ToteaGroup {
       if (totea._virtualFn) continue;
 
       result[key] = totea.toSchema();
+
+      // if computedFn is a pure function, assign it to mongoose schema's get
+      if (isFunction(totea._computedFn)) {
+        result[key].get = function () {
+          return totea._computedFn(this);
+        };
+      }
+
+      // if computedFn is a async function, we need to register a hook to handle it
+      // and insert this callback at start of all hooks
+      if (isAsyncFunction(totea._computedFn)) {
+        this.beforeCreateOrUpdate(async (doc, ...args) => {
+          doc[key] = await totea._computedFn(doc, ...args);
+        }, false);
+      }
     }
 
     return result;
@@ -541,11 +568,11 @@ class ToteaGroup {
   }
 
   toCreateFormShema() {
-    return this._toFormShema(true)
+    return this._toFormShema(true);
   }
 
   toUpdateFormShema() {
-    return this._toFormShema()
+    return this._toFormShema();
   }
 
   getExcludeList() {
@@ -701,21 +728,28 @@ class ToteaGroup {
   _mappingHooks(...list) {
     for (const hook of list) {
       if (!isString(hook)) {
-        throw new Error('hook name expected a string')
+        throw new Error("hook name expected a string");
       }
 
-      defineEnumerablePropertry(this, `_${hook}`, [])
+      defineEnumerablePropertry(this, `_${hook}`, []);
 
       defineEnumerablePropertry(this, `${hook}Caller`, async (...args) => {
         for (const callback of this[`_${hook}`]) {
-          await callback(...args)
+          await callback(...args);
         }
-      })
+      });
 
-      this[hook] = (callback) => {
-        if (!isFunc(callback)) throw new Error(`callback named ${hook} expected a function, but got a ${callback}`)
-        this[`_${hook}`].push(callback)
-      }
+      this[hook] = (callback, atLast = true) => {
+        if (!isFunc(callback))
+          throw new Error(
+            `callback named ${hook} expected a function, but got a ${callback}`
+          );
+        if (atLast) {
+          this[`_${hook}`].push(callback);
+        } else {
+          this[`_${hook}`].unshift(callback);
+        }
+      };
     }
   }
 }
@@ -809,7 +843,11 @@ const enums = (values, name) =>
 const boolean = (name) => new Totea().boolean().name(name).formType("switch");
 
 const array = (childType, name) =>
-  new Totea().array(childType).name(name).cate("array").formType("dynamic_tags");
+  new Totea()
+    .array(childType)
+    .name(name)
+    .cate("array")
+    .formType("dynamic_tags");
 
 const ids = (refName, name, msg) =>
   array({ type: ObjectId, ref: refName }, null, msg)
