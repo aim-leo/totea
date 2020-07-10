@@ -51,17 +51,15 @@ class ToteaModel {
 
         try {
           // call before create hook
-          if (isFunc(this.toteaGroup.beforeCreate)) {
-            const returns = await this.toteaGroup.beforeCreate(doc)
-
-            if (returns && isObject(doc)) doc = returns
+          if (isFunc(this.toteaGroup.beforeCreateCaller)) {
+            await this.toteaGroup.beforeCreateCaller(doc)
           }
 
           const result = await this.model.create(doc, ...args)
 
           // call after create hook
-          if (isFunc(this.toteaGroup.afterCreate)) {
-            await this.toteaGroup.afterCreate(result)
+          if (isFunc(this.toteaGroup.afterCreateCaller)) {
+            await this.toteaGroup.afterCreateCaller(result)
           }
 
           resolve(result)
@@ -129,19 +127,15 @@ class ToteaModel {
       self.update({}, { $set: { updateTime: new Date() } })
 
       // call before update hook
-      if (isFunc(this.toteaGroup.beforeUpdate)) {
-        const returns = await this.toteaGroup.beforeUpdate(doc, self)
-
-        if (returns && isObject(returns)) {
-          self.update({}, { $set: returns })
-        }
+      if (isFunc(this.toteaGroup.beforeUpdateCaller)) {
+        await this.toteaGroup.beforeUpdateCaller(doc, self)
       }
 
       await next()
 
       // call after update hook
-      if (isFunc(this.toteaGroup.afterUpdate)) {
-        await this.toteaGroup.afterUpdate()
+      if (isFunc(this.toteaGroup.afterUpdateCaller)) {
+        await this.toteaGroup.afterUpdateCaller()
       }
     } catch (e) {
       next(e)
@@ -224,13 +218,13 @@ class ToteaModel {
 
     this.schema.pre('findOneAndRemove', async function (next) {
       // call before delete hook
-      if (isFunc(THIS.toteaGroup.beforeDelete)) {
-        await THIS.toteaGroup.beforeDelete(this._conditions)
+      if (isFunc(THIS.toteaGroup.beforeDeleteCaller)) {
+        await THIS.toteaGroup.beforeDeleteCaller(this._conditions)
       }
       await next()
       // call after delete hook
-      if (isFunc(THIS.toteaGroup.afterDelete)) {
-        await THIS.toteaGroup.afterDelete(this._conditions)
+      if (isFunc(THIS.toteaGroup.afterDeleteCaller)) {
+        await THIS.toteaGroup.beforeDeleteCaller(this._conditions)
       }
     })
 

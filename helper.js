@@ -199,6 +199,13 @@ function readFileList(dir, reg) {
   return result
 }
 
+function defineEnumerablePropertry(target, key, value) {
+  Object.defineProperty(target, key, {
+    value,
+    enumerable: false
+  })
+}
+
 module.exports = {
   whatType,
   isType,
@@ -222,5 +229,7 @@ module.exports = {
 
   removeEmpty,
   randomString,
-  readFileList
+  readFileList,
+
+  defineEnumerablePropertry
 }

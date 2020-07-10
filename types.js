@@ -12,6 +12,7 @@ const {
   isObject,
   isArray,
   removeEmpty,
+  defineEnumerablePropertry
 } = require("./helper");
 
 const validator = require("./validator");
@@ -471,14 +472,7 @@ class ToteaGroup {
   constructor(tree) {
     this.tree = tree;
 
-    this.beforeCreate = null;
-    this.afterCreate = null;
-
-    this.beforeUpdate = null;
-    this.afterUpdate = null;
-
-    this.beforeDelete = null;
-    this.afterDelete = null;
+    this._mappingHooks('beforeCreate', 'afterCreate', 'beforeUpdate', 'afterUpdate', 'beforeDelete', 'afterDelete')
   }
 
   get refDbList() {
@@ -703,6 +697,27 @@ class ToteaGroup {
       }
     }
   }
+
+  _mappingHooks(...list) {
+    for (const hook of list) {
+      if (!isString(hook)) {
+        throw new Error('hook name expected a string')
+      }
+
+      defineEnumerablePropertry(this, `_${hook}`, [])
+
+      defineEnumerablePropertry(this, `${hook}Caller`, async (...args) => {
+        for (const callback of this[`_${hook}`]) {
+          await callback(...args)
+        }
+      })
+
+      this[hook] = (callback) => {
+        if (!isFunc(callback)) throw new Error(`callback named ${hook} expected a function, but got a ${callback}`)
+        this[`_${hook}`].push(callback)
+      }
+    }
+  }
 }
 
 const id = (name) =>
@@ -711,7 +726,7 @@ const id = (name) =>
 const ref = (val, name) => id(name).ref(val).formType("id_select");
 
 const shortText = (name) =>
-  new Totea().string().min(3).max(30).name(name).formType("input");
+  new Totea().string().min(1).max(30).name(name).formType("input");
 
 const text = (name) =>
   new Totea().string().min(3).max(1000).name(name).formType("textarea");
