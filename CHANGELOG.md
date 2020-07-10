@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.8.1](https://github.com/aim-leo/totea/compare/v1.8.0...v1.8.1) (2020-07-10)
+
+
+### Features
+
+* 🎸 formCate->formType, assign default formType ([4226835](https://github.com/aim-leo/totea/commit/4226835267497394534dc00b15ffb0001933a9fd))
+
 ## [1.8.0](https://github.com/aim-leo/totea/compare/v1.7.3...v1.8.0) (2020-07-09)
 
 
