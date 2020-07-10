@@ -9,6 +9,10 @@ class Server extends ToteaServer{
       res.send('totea server is running!')
     })
   }
+
+  customizeToTeaRouter(toteaRoute) {
+    toteaRoute.injectUpload(['image'])
+  }
 }
 
 new Server({

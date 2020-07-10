@@ -5,4 +5,4 @@ const ToteaGroup = types.ToteaGroup
 
 const group = new ToteaGroup(types.baseMixin)
 
-module.exports = new Model('tag', group)
+module.exports = new Model('post-tag', group)

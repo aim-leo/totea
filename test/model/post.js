@@ -8,7 +8,7 @@ const group = new ToteaGroup({
   name: types.shortText('标题').required(),
   summary: types.text('简介').required(),
   detail: types.longText('文章详情').required(),
-  category: types.ref('post-category', '分类').required(),
+  category: types.ref('post-category', '分类').required().formType('category'),
   auther: types
     .ref('admin', '作者')
     .refFilter({ role: 1 }, '只有文章发布员才能新建文章')
@@ -22,5 +22,7 @@ const group = new ToteaGroup({
   isForbid: types.boolean('已禁用').forbidCreate().default(false),
   top: types.int('置顶等级').max(10).default(0)
 })
+
+console.log(group.createFormSchema)
 
 module.exports = new Model('post', group)
