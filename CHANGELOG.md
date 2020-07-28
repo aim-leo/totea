@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.10.0](https://github.com/aim-leo/totea/compare/v1.9.0...v1.10.0) (2020-07-28)
+
+
+### Features
+
+* 🎸 add images type ([3337728](https://github.com/aim-leo/totea/commit/33377284427dbabad6dc2fbd3cdbfe481c67e93e))
+
 ## [1.9.0](https://github.com/aim-leo/totea/compare/v1.8.2...v1.9.0) (2020-07-10)
 
 
