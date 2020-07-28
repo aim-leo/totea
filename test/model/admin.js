@@ -9,4 +9,6 @@ const group = new ToteaGroup({
   role: types.enums([1, 2, 3], '角色').required() // 1 文章发布员 2 招聘管理员 3 管理员
 })
 
+console.log(group.toCreateFormShema())
+
 module.exports = new Model('admin', group)

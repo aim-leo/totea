@@ -93,9 +93,8 @@ function createUpload(name, folder) {
 
       // resize
       const fileBuffer = await getFileBuffer(req.file.path)
-      const filePath =
-        dir +
-        `/upload_${name}_${md5(fileBuffer)}.${req.file.path.split('.').reverse()[0]}`
+      const fileName = `/upload_${name}_${md5(fileBuffer)}.${req.file.path.split('.').reverse()[0]}`
+      const filePath = dir + fileName
 
       // if un exsist
       if (!(await fs.exists(filePath))) {
@@ -105,7 +104,7 @@ function createUpload(name, folder) {
       res.json({
         code: 1,
         message: '上传成功!',
-        data: filePath.replace('public', '')
+        data: folder + fileName
       })
     }
   )

@@ -8,6 +8,7 @@
   "verbose": true,
   "watch": [
     "test/model",
+    "test/service",
     "test/www",
     "./*.js"
   ],

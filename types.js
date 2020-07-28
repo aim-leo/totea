@@ -835,8 +835,6 @@ const createTime = (name = "创建时间") => dateNow(name);
 
 const updateTime = (name = "创建时间") => dateNow(name).cate("updateTime");
 
-const image = (name) => text(name).cate("image").formType("upload");
-
 const enums = (values, name) =>
   new Totea().name(name).enum(values).cate("enums").formType("radio");
 
@@ -855,6 +853,9 @@ const ids = (refName, name, msg) =>
     .cate("id")
     .name(name)
     .formType("multi_select");
+
+const images = name => array(String, name).cate("image").formType("upload");
+const image = name => images(name).max(1)
 
 const baseMixin = {
   name: shortText("名称").required(),
@@ -877,6 +878,27 @@ const accountMixin = {
   email: email(),
 };
 
+const categoryMixinFunction = modelName => {
+  if (!isString(modelName)) {
+    throw new Error(`modelName expected a string, but got a ${modelName}`)
+  }
+  return {
+    parent: ref(modelName, '父分类'),
+    level: int('级别').computed(async doc => {
+      if (!doc.parent) return 0
+      const model = mongoose.models[modelName]
+  
+      if (!model) throw new Error(`computed level error, category model: ${modelName} can not find`)
+  
+      const parent = await model.findById(doc.parent)
+      if (!parent) throw new Error(`computed level error, can not find id ${doc.parent} at ${modelName} model`)
+  
+      return (parent.level || 0) + 1
+    }),
+    children: ids(modelName, '子分类').forbid()
+  }
+}
+
 module.exports = {
   ToteaGroup,
   Totea,
@@ -898,6 +920,7 @@ module.exports = {
   createTime,
   updateTime,
   image,
+  images,
   enums,
   boolean,
   array,
@@ -906,4 +929,6 @@ module.exports = {
   baseMixin,
   addressMixin,
   accountMixin,
+
+  categoryMixinFunction,
 };
