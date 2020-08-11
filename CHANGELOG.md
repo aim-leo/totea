@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.10.1](https://github.com/aim-leo/totea/compare/v1.10.0...v1.10.1) (2020-08-11)
+
+
+### Features
+
+* 🎸 enable generate element-ui rules ([008956f](https://github.com/aim-leo/totea/commit/008956ffd5c790031eaec41cfa1a5f1f11c61f5f))
+
 ## [1.10.0](https://github.com/aim-leo/totea/compare/v1.9.0...v1.10.0) (2020-07-28)
 
 
