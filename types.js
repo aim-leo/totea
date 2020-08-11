@@ -17,7 +17,7 @@ const {
   defineEnumerablePropertry,
 } = require("./helper");
 
-const validator = require("./validator");
+const { validator, getValidatorMessage } = require("./validator");
 
 class Totea {
   constructor() {
@@ -378,6 +378,119 @@ class Totea {
     return removeEmpty(result);
   }
 
+  // generate rule of element-ui
+  toElementRule() {
+    function toRuleList(obj) {
+      return [
+        {
+          ...obj,
+          trigger: "blur",
+        },
+        {
+          ...obj,
+          trigger: "change",
+        },
+      ];
+    }
+    const rule = [];
+
+    // assign required
+    if (this._required) {
+      rule.push(
+        ...toRuleList({
+          required: true,
+          message: getValidatorMessage("required", this._name),
+        })
+      );
+    }
+
+    const type = this._class2Type(this._type)[0];
+
+    // assign type
+    if (type) {
+      // if number, validate positive or float
+      if (type === "number") {
+        rule.push(
+          ...toRuleList({
+            type: this._formType === "int" ? "integer" : "float",
+            message: `${this._name}字段必须为${
+              this._formType === "int" ? "整" : "小"
+            }数`,
+          })
+        );
+      } else {
+        rule.push(
+          ...toRuleList({
+            type,
+            message: getValidatorMessage(type, this._name),
+          })
+        );
+      }
+    }
+
+    // assign length
+    if (this._length !== undefined && ["string", "array"].includes(type)) {
+      rule.push(
+        ...toRuleList({
+          length: this._length,
+          message: getValidatorMessage(
+            type + "Length",
+            this._name,
+            this._length
+          ),
+        })
+      );
+    }
+
+    // assign min, max
+    if (
+      this._min !== undefined &&
+      ["string", "number", "array"].includes(type)
+    ) {
+      rule.push(
+        ...toRuleList({
+          min: this._min,
+          message: getValidatorMessage(type + "Min", this._name, this._min),
+        })
+      );
+    }
+    if (
+      this._max !== undefined &&
+      ["string", "number", "array"].includes(type)
+    ) {
+      rule.push(
+        ...toRuleList({
+          max: this._max,
+          message: getValidatorMessage(type + "Max", this._name, this._max),
+        })
+      );
+    }
+
+    // assign addtional validator
+    if (this._validator.length > 0) {
+      this._validator.map((v) => {
+        const { func, msg } = v;
+        rule.push(
+          ...toRuleList({
+            type,
+            asyncValidator: (rule, value) => {
+              return new Promise(async (resolve, reject) => {
+                const passed = await func(value);
+
+                if (passed === false) {
+                  reject(msg);
+                }
+
+                resolve();
+              });
+            },
+          })
+        );
+      });
+    }
+    return rule;
+  }
+
   getRefConfig() {
     return {
       ref: this._ref,
@@ -406,26 +519,9 @@ class Totea {
       .join("和");
 
     const messages = {
-      required: `必填项:${this._name}`,
       forbidden:
         json.type === "forbidden"
           ? `${this._name}不允许在${forbidMsg}时输入`
-          : undefined,
-      stringMin:
-        this._min && json.type === "string"
-          ? `${this._name}字符长度过短,应大于${this._min}`
-          : undefined,
-      stringMax:
-        this._max && json.type === "string"
-          ? `${this._name}字符长度过长,应小于${this._max}`
-          : undefined,
-      numberMin:
-        this._min && json.type === "number"
-          ? `${this._name}不应小于最小值:${this._min}`
-          : undefined,
-      numberMax:
-        this._max && json.type === "number"
-          ? `${this._name}不应大于最大值:${this._max}`
           : undefined,
     };
 
@@ -573,6 +669,34 @@ class ToteaGroup {
 
   toUpdateFormShema() {
     return this._toFormShema();
+  }
+
+  toElementRules() {
+    const result = {};
+    for (const key in this.tree) {
+      const totea = this.tree[key];
+
+      if (!(totea instanceof Totea)) continue;
+
+      // if is virtual prop, ignore it
+      if (
+        ["createTime", "updateTime"].includes(key) ||
+        totea._virtualFn ||
+        totea._computedFn
+      )
+        continue;
+
+      // if computedFn is a pure function, assign it to mongoose schema's get
+      if (isFunction(totea._computedFn)) {
+        result[key].get = function () {
+          return totea._computedFn(this);
+        };
+      }
+
+      result[key] = totea.toElementRule();
+    }
+
+    return result;
   }
 
   getExcludeList() {
@@ -854,8 +978,8 @@ const ids = (refName, name, msg) =>
     .name(name)
     .formType("multi_select");
 
-const images = name => array(String, name).cate("image").formType("upload");
-const image = name => images(name).max(1)
+const images = (name) => array(String, name).cate("image").formType("upload");
+const image = (name) => images(name).length(1);
 
 const baseMixin = {
   name: shortText("名称").required(),
@@ -878,26 +1002,32 @@ const accountMixin = {
   email: email(),
 };
 
-const categoryMixinFunction = modelName => {
+const categoryMixinFunction = (modelName) => {
   if (!isString(modelName)) {
-    throw new Error(`modelName expected a string, but got a ${modelName}`)
+    throw new Error(`modelName expected a string, but got a ${modelName}`);
   }
   return {
-    parent: ref(modelName, '父分类'),
-    level: int('级别').computed(async doc => {
-      if (!doc.parent) return 0
-      const model = mongoose.models[modelName]
-  
-      if (!model) throw new Error(`computed level error, category model: ${modelName} can not find`)
-  
-      const parent = await model.findById(doc.parent)
-      if (!parent) throw new Error(`computed level error, can not find id ${doc.parent} at ${modelName} model`)
-  
-      return (parent.level || 0) + 1
+    parent: ref(modelName, "父分类"),
+    level: int("级别").computed(async (doc) => {
+      if (!doc.parent) return 0;
+      const model = mongoose.models[modelName];
+
+      if (!model)
+        throw new Error(
+          `computed level error, category model: ${modelName} can not find`
+        );
+
+      const parent = await model.findById(doc.parent);
+      if (!parent)
+        throw new Error(
+          `computed level error, can not find id ${doc.parent} at ${modelName} model`
+        );
+
+      return (parent.level || 0) + 1;
     }),
-    children: ids(modelName, '子分类').forbid()
-  }
-}
+    children: ids(modelName, "子分类").forbid(),
+  };
+};
 
 module.exports = {
   ToteaGroup,
