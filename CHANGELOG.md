@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.10.2](https://github.com/aim-leo/totea/compare/v1.10.1...v1.10.2) (2020-08-12)
+
+
+### Bug Fixes
+
+* 🐛 getElementRule length error ([b917a29](https://github.com/aim-leo/totea/commit/b917a29d57e5a4267695f06cf03d23082ad23578))
+
 ### [1.10.1](https://github.com/aim-leo/totea/compare/v1.10.0...v1.10.1) (2020-08-11)
 
 
