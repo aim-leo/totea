@@ -20,7 +20,8 @@ const group = new ToteaGroup({
   starNum: types.int('点赞数').forbidCreate().default(0),
   hot: types.int('文章热度').computed(doc => doc.starNum * 5 + doc.readNum),
   isForbid: types.boolean('已禁用').forbidCreate().default(false),
-  top: types.int('置顶等级').max(10).default(0)
+  top: types.int('置顶等级').max(10).default(0),
+  email: types.email(),
 })
 
 module.exports = new Model('post', group)

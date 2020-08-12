@@ -5,7 +5,7 @@
  * @Last Modified time: 2019-07-29 13:56:40
  */
 
-const validator = require('./validator')
+const { validator } = require('./validator')
 const { isString } = require('./helper')
 
 const Util = require('./util')

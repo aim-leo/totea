@@ -409,30 +409,19 @@ class Totea {
     // assign type
     if (type) {
       // if number, validate positive or float
-      if (type === "number") {
-        rule.push(
-          ...toRuleList({
-            type: this._formType === "int" ? "integer" : "float",
-            message: `${this._name}字段必须为${
-              this._formType === "int" ? "整" : "小"
-            }数`,
-          })
-        );
-      } else {
-        rule.push(
-          ...toRuleList({
-            type,
-            message: getValidatorMessage(type, this._name),
-          })
-        );
-      }
+      rule.push(
+        ...toRuleList({
+          type,
+          message: getValidatorMessage(type, this._name),
+        })
+      );
     }
 
     // assign length
     if (this._length !== undefined && ["string", "array"].includes(type)) {
       rule.push(
         ...toRuleList({
-          length: this._length,
+          len: this._length,
           message: getValidatorMessage(
             type + "Length",
             this._name,
