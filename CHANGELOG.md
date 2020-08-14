@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.11.1](https://github.com/aim-leo/totea/compare/v1.11.0...v1.11.1) (2020-08-14)
+
+
+### Bug Fixes
+
+* 🐛 set library of webpack ([dc1de86](https://github.com/aim-leo/totea/commit/dc1de868599dc7dae625285d7f4ef67153b2101e))
+
 ## [1.11.0](https://github.com/aim-leo/totea/compare/v1.10.2...v1.11.0) (2020-08-14)
 
 
