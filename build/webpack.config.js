@@ -1,13 +1,27 @@
 const path = require("path");
 
+function formatEntry(list) {
+  const entry = {}
+
+  for (const item of list) {
+    entry['totea' + item.substr(0, 1).toUpperCase() + item.substr(1)] = path.resolve(__dirname, "..", item + ".js")
+  }
+
+  return entry
+}
+
 module.exports = {
-  entry: {
-    types: path.resolve(__dirname, "..", "types.js"),
-  },
+  entry: formatEntry([
+    'types'
+  ]),
   output: {
     path: path.resolve(__dirname, "..", "dist"),
-    filename: "totea-[name].js",
+    filename: context => {
+      const resource = context.chunk.entryModule.resource
+      return 'totea-' + resource.split('/').reverse()[0]
+    },
     libraryTarget: "umd",
+    library: "[name]"
   },
   module: {
     rules: [
