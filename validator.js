@@ -30,7 +30,7 @@ const validator = new FastestValidator({
     arrayEmpty: "{field}字段不能为空数组",
     arrayMin: "{field}字段必须至少包含{expected}个项目",
     arrayMax: " {field}字段必须包含小于或等于{expected}个项目",
-    arrayLength: "{field}字段必须包含{expected}个项目",
+    arrayLength: "{field}字段必须只包含{expected}个项目",
     arrayContains: "{field}字段必须包含{expected}项",
     arrayUnique: "{field}字段中的{actual}值不会唯一化{expected}值",
     arrayEnum: "{field}字段中的{actual}值与任何{expected}值都不匹配",

@@ -1,8 +1,9 @@
 const mongoose = require('mongoose')
 
-const { isString, isFunc, isArray, isObject } = require('./helper')
+const { isString, isFunc, isArray } = require('./helper')
 const connect = require('./db')
 const types = require('./types')
+const { toMongooseSchema } = require('./schema')
 
 const ToteaGroup = types.ToteaGroup
 
@@ -80,7 +81,7 @@ class ToteaModel {
     }
 
     this.toteaGroup = toteaGroup
-    this.schema = toteaGroup.toSchema()
+    this.schema = toMongooseSchema(toteaGroup)
 
     this.schema.set('toJSON', { getters: true, virtuals: true })
 

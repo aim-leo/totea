@@ -1,7 +1,3 @@
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
-const ObjectId = Schema.Types.ObjectId;
-
 const {
   isNumber,
   isUndef,
@@ -288,13 +284,6 @@ class Totea {
     return this;
   }
 
-  // countModel(modelName, filter = {}) {
-  //   this._countModelName = modelName
-  //   this._countFilter = filter
-
-  //   return this
-  // }
-
   toValidateJson(isCreate = false) {
     if (!this.isFinalise) {
       throw new Error(
@@ -375,6 +364,10 @@ class Totea {
       result.attrs.max = this._max;
     }
 
+    if (!isUndef(this._length)) {
+      result.attrs.length = this._length;
+    }
+
     return removeEmpty(result);
   }
 
@@ -421,6 +414,7 @@ class Totea {
     if (this._length !== undefined && ["string", "array"].includes(type)) {
       rule.push(
         ...toRuleList({
+          type,
           len: this._length,
           message: getValidatorMessage(
             type + "Length",
@@ -438,6 +432,7 @@ class Totea {
     ) {
       rule.push(
         ...toRuleList({
+          type,
           min: this._min,
           message: getValidatorMessage(type + "Min", this._name, this._min),
         })
@@ -449,6 +444,7 @@ class Totea {
     ) {
       rule.push(
         ...toRuleList({
+          type,
           max: this._max,
           message: getValidatorMessage(type + "Max", this._name, this._max),
         })
@@ -462,16 +458,14 @@ class Totea {
         rule.push(
           ...toRuleList({
             type,
-            asyncValidator: (rule, value) => {
-              return new Promise(async (resolve, reject) => {
-                const passed = await func(value);
+            validator: async (rule, value, callback) => {
+              const passed = await func(value);
 
-                if (passed === false) {
-                  reject(msg);
-                }
+              if (passed === false) {
+                callback(new Error(msg));
+              }
 
-                resolve();
-              });
+              callback();
             },
           })
         );
@@ -961,7 +955,7 @@ const array = (childType, name) =>
     .formType("dynamic_tags");
 
 const ids = (refName, name, msg) =>
-  array({ type: ObjectId, ref: refName }, null, msg)
+  array({ type: String, ref: refName }, null, msg)
     .ref(refName)
     .cate("id")
     .name(name)

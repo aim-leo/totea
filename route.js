@@ -3,12 +3,70 @@ const path = require('path')
 const merge = require('deepmerge')
 
 const express = require('./express')
-const { isString, isObject, isFunc, isArray, readFileList } = require('./helper')
+const { isString, isObject, isFunc, isArray } = require('./helper')
 
 const ToteaService = require('./service')
 const ToteaControoler = require('./controller')
 const { parseRequestParams } = require('./middleware')
 const createUpload = require('./upload')
+
+function formatFileName(file) {
+  if (!isString(file)) {
+    throw new Error('file name expected a string type')
+  }
+  return file.split('.').slice(0, -1).join('-')
+}
+
+function readFileList(dir, reg) {
+  const fs = require('fs')
+  const path = require('path')
+
+  if (isNil(dir) || !isString(dir)) {
+    throw new Error('dir expecetd a string type')
+  }
+
+  if (isString(reg)) {
+    reg = new RegExp(`.${reg}$`)
+  }
+
+  if (!isUndef(reg) && !isReg(reg)) {
+    throw new Error('dir expecetd undefined or a reg type')
+  }
+
+  const fileList = fs.readdirSync(dir)
+
+  const result = []
+
+  for (const file of fileList) {
+    const p = path.join(dir, file)
+    const stat = fs.statSync(p)
+
+    if (!stat.isFile()) {
+      continue
+    }
+
+    if (reg && !reg.test(file)) {
+      continue
+    }
+
+    result.push(file)
+  }
+
+  result.toObject = function() {
+    const r = {}
+    for (const f of result) {
+      const name = formatFileName(f)
+
+      if (!name) throw new Error('name is empty!')
+
+      r[name] = f
+    }
+
+    return r
+  }
+
+  return result
+}
 
 class ToteaRoute {
   constructor({
