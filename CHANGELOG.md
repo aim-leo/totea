@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.11.0](https://github.com/aim-leo/totea/compare/v1.10.2...v1.11.0) (2020-08-14)
+
+
+### Features
+
+* 🎸 build totea/types.js ([5bee1df](https://github.com/aim-leo/totea/commit/5bee1dfeed2a5dfc3405b6eeae203fb9b27a6237))
+
 ### [1.10.2](https://github.com/aim-leo/totea/compare/v1.10.1...v1.10.2) (2020-08-12)
 
 
