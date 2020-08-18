@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.12.0](https://github.com/aim-leo/totea/compare/v1.11.1...v1.12.0) (2020-08-18)
+
+
+### Features
+
+* 🎸 add /form route ([74eceeb](https://github.com/aim-leo/totea/commit/74eceebb5ba87e32f50e21cc6ec08f4dfea70f65))
+
 ### [1.11.1](https://github.com/aim-leo/totea/compare/v1.11.0...v1.11.1) (2020-08-14)
 
 
