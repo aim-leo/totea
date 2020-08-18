@@ -234,6 +234,16 @@ class ToteaRoute {
         )
       })
 
+    // mapping form create page
+    const toteaGroup = this._models[routeName].toteaGroup
+    router
+      .route('/form')
+      .get(
+        async (req, res, next) => {
+          res.render('form', { title: routeName, schema: JSON.stringify(toteaGroup.createFormSchema), action: routeName })
+        }
+      )
+
     // at last, write json
     router.use((req, res, next) => {
       controller.jsonRes(res, res.preRes)

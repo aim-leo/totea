@@ -576,10 +576,6 @@ class ToteaGroup {
     return this.toUpdateJson();
   }
 
-  get schema() {
-    return this.toSchema();
-  }
-
   get createFormSchema() {
     return this.toCreateFormShema();
   }
@@ -635,15 +631,6 @@ class ToteaGroup {
     }
 
     return result;
-  }
-
-  toSchema() {
-    const schema = new Schema(this.toJsonSchema());
-
-    // assigin virtual prop
-    this._assignVirtualProp(schema);
-
-    return schema;
   }
 
   toCreateFormShema() {

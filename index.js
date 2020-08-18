@@ -77,6 +77,10 @@ class ToteaServer {
     app.use(express.json())
     app.use(express.urlencoded({ extended: false }))
     app.use(cookieParser())
+
+    // set html engine
+    app.set('views', path.resolve('./views'))
+    app.set('view engine', 'ejs')
     
     this.defineStatic(app)
 

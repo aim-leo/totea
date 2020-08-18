@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no,minimal-ui"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-touch-fullscreen" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="format-detection" content="telephone=no,email=no" />
+    <meta name="description" content="ToteaForm" />
+    <meta name="keywords" content="ToteaForm" />
+    <meta name="robots" content="index,follow" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <meta name="screen-orientation" content="portrait" />
+    <meta name="full-screen" content="yes" />
+    <meta name="browsermode" content="application" />
+    <meta name="x5-orientation" content="portrait" />
+    <meta name="x5-fullscreen" content="true" />
+    <meta name="x5-page-mode" content="app" />
+    <title>
+      create <%=title%>
+    </title>
+    <link href="https://cdn.jsdelivr.net/npm/element-ui@2.10.0/lib/theme-chalk/index.css" rel="stylesheet" />
+    <style>
+      #app{
+        width: 1024px;
+        margin: 0 auto;
+        margin-top: 30px;
+        padding: 10px 0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="app">
+      <totea-form
+        v-model="form"
+        :schema="schema"
+        action="<%=action%>"
+        base-url="http://localhost:3000"
+        @comfirm="onComfirm"
+      >
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@0.19.0/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/element-ui@2.10.0/lib/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/totea-form/dist/totea-form.js"></script>
+    <script>
+      new Vue({
+        el: "#app",
+        data() {
+          return {
+            form: {},
+            schema: JSON.parse('<%-schema%>')
+          };
+        },
+        methods: {
+          handleChange() {
+            console.log("handleChange");
+          },
+          onComfirm(value) {
+            console.log("comfirm", value);
+          },
+        },
+        created() {},
+      });
+    </script>
+  </body>
+</html>

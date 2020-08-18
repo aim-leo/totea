@@ -15,7 +15,7 @@ const group = new ToteaGroup({
     .forbidUpdate()
     .required(),
   keyword: types.array(String, '关键词'),
-  tag: types.ids('tag', '标签').min(1),
+  tag: types.ids('tag', '标签').max(2),
   readNum: types.int('阅读数').forbidCreate().default(0),
   starNum: types.int('点赞数').forbidCreate().default(0),
   hot: types.int('文章热度').computed(doc => doc.starNum * 5 + doc.readNum),
