@@ -1,266 +1,271 @@
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 
-const { isString, isFunc, isArray } = require('./helper')
-const connect = require('./db')
-const types = require('./types')
-const { toMongooseSchema } = require('./schema')
+const { isString, isFunc, isArray } = require("./helper");
+const connect = require("./db");
+const types = require("./types");
+const { toMongooseSchema } = require("./schema");
 
-const ToteaGroup = types.ToteaGroup
+const ToteaGroup = types.ToteaGroup;
 
 class ToteaModel {
-  static mongoUri
+  static mongoUri;
 
   constructor(modelName, toteaGroup) {
-    this._preHandle(modelName, toteaGroup)
+    this._beforeInit(modelName, toteaGroup);
   }
 
   async exsist(params) {
     try {
-      const item = await this.model.findOne(params)
+      const item = await this.model.findOne(params);
 
-      if (item) return true
+      if (item) return true;
 
-      return false
+      return false;
     } catch (e) {
-      console.error(e)
+      console.error(e);
 
-      return false
+      return false;
     }
   }
 
   findOneAndUpdate(conditions, params) {
     return this.model.findOneAndUpdate(conditions, params, {
       new: true,
-      runValidators: true
-    })
+      runValidators: true,
+    });
   }
 
   findByIdAndUpdate(conditions, params) {
     return this.model.findByIdAndUpdate(conditions, params, {
       new: true,
-      runValidators: true
-    })
+      runValidators: true,
+    });
   }
 
   create(doc, ...args) {
     return new Promise((resolve, reject) => {
       // validate
-      this._checkCreate(doc, async err => {
+      this._checkCreate(doc, async (err) => {
         if (err) {
-          reject(err)
+          return reject(err);
         }
 
         try {
           // call before create hook
           if (isFunc(this.toteaGroup.beforeCreateCaller)) {
-            await this.toteaGroup.beforeCreateCaller(doc)
+            await this.toteaGroup.beforeCreateCaller(doc);
           }
 
-          const result = await this.model.create(doc, ...args)
+          const result = await this.model.create(doc, ...args);
 
           // call after create hook
           if (isFunc(this.toteaGroup.afterCreateCaller)) {
-            await this.toteaGroup.afterCreateCaller(result)
+            await this.toteaGroup.afterCreateCaller(result);
           }
 
-          resolve(result)
+          resolve(result);
         } catch (e) {
-          reject(e)
+          reject(e);
         }
-      })
-    })
+      });
+    });
   }
 
-  _preHandle(modelName, toteaGroup) {
+  _beforeInit(modelName, toteaGroup) {
     if (!isString(modelName)) {
-      throw new Error(`modelName expected a string, but get a ${modelName}`)
+      throw new Error(`modelName expected a string, but get a ${modelName}`);
     }
 
     if (!(toteaGroup instanceof ToteaGroup)) {
-      throw new Error(`toteaGroup expected a ToteaGroup, but get a ${toteaGroup}`)
+      throw new Error(
+        `toteaGroup expected a ToteaGroup, but get a ${toteaGroup}`
+      );
     }
 
-    this.toteaGroup = toteaGroup
-    this.schema = toMongooseSchema(toteaGroup)
+    this.toteaGroup = toteaGroup;
+    this.schema = toMongooseSchema(toteaGroup);
 
-    this.schema.set('toJSON', { getters: true, virtuals: true })
+    this.schema.set("toJSON", { getters: true, virtuals: true });
 
     // assign middleware
-    this._assignMiddleware()
+    this._assignMiddleware();
 
-    this.model = connect(ToteaModel.mongoUri).model(modelName, this.schema)
+    this.model = connect(ToteaModel.mongoUri).model(modelName, this.schema);
 
     // mapping model method
-    this._mappingModelMethod()
+    this._mappingModelMethod();
   }
 
   async _checkCreate(doc, next) {
     try {
       // check doc
-      const errorMessage = await this.toteaGroup.validateCreate(doc)
+      const errorMessage = await this.toteaGroup.validateCreate(doc);
 
       if (errorMessage) {
-        next(new Error(errorMessage))
+        return next(new Error(errorMessage));
       }
 
       // validateRef
-      await this._checkRef(doc, next)
+      const err = await this._checkRef(doc);
 
-      next()
+      if (err) return next(err);
+
+      next();
     } catch (e) {
-      next(e)
+      next(e);
     }
   }
 
   async _checkUpdate(doc, self, next) {
     try {
       // check doc
-      const errorMessage = await this.toteaGroup.validateUpdate(doc)
+      const errorMessage = await this.toteaGroup.validateUpdate(doc);
 
       if (errorMessage) {
-        next(new Error(errorMessage))
+        return next(new Error(errorMessage));
       }
 
       // validateRef
-      await this._checkRef(doc, next)
+      const err = await this._checkRef(doc);
+
+      if (err) return next(err);
 
       // assign updateTime
-      self.update({}, { $set: { updateTime: new Date() } })
+      self.update({}, { $set: { updateTime: new Date() } });
 
       // call before update hook
       if (isFunc(this.toteaGroup.beforeUpdateCaller)) {
-        await this.toteaGroup.beforeUpdateCaller(doc, self)
+        await this.toteaGroup.beforeUpdateCaller(doc, self);
       }
 
-      await next()
+      await next();
 
       // call after update hook
       if (isFunc(this.toteaGroup.afterUpdateCaller)) {
-        await this.toteaGroup.afterUpdateCaller()
+        await this.toteaGroup.afterUpdateCaller();
       }
     } catch (e) {
-      next(e)
+      next(e);
     }
   }
 
   // validate the ref id is current
-  async _checkRef(doc, next) {
+  async _checkRef(doc) {
     // get ref list
-    const refConfig = this.toteaGroup.refConfig
+    const refConfig = this.toteaGroup.refConfig;
     for (const key in refConfig) {
-      if (!doc[key]) continue
+      if (!doc[key]) continue;
 
-      const { ref, refFilter = {}, isArray: _isArray } = refConfig[key]
-      const model = mongoose.models[ref]
+      const { ref, refFilter = {}, isArray: _isArray } = refConfig[key];
+      const model = mongoose.models[ref];
 
-      if (!model) next(new Error(`新增失败， ${ref}表不存在`))
+      if (!model) throw new Error(`新增失败， ${ref}表不存在`);
 
-      const { filter, msg } = refFilter
+      const { filter, msg } = refFilter;
 
-      const ids = _isArray ? doc[key] : [doc[key]]
+      const ids = _isArray ? doc[key] : [doc[key]];
 
       if (!isArray(ids)) {
-        next('_checkRef error, expected a id list')
-        return
+        throw new Error("_checkRef error, expected a id list");
       }
 
       for (const _id of ids) {
         let filterVal = {
-          _id
-        }
+          _id,
+        };
 
         if (filter && isFunc(filter)) {
           filterVal = {
             ...filterVal,
-            ...filter(doc)
-          }
+            ...filter(doc),
+          };
         }
 
         // test id exsist
-        const item = await model.findOne(filterVal)
+        const item = await model.findOne(filterVal);
 
         if (!item) {
-          next(new Error(msg || `新增失败， ${ref}表不存在id为${_id}的项`))
-          return
+          throw new Error(msg || `新增失败， ${ref}表不存在id为${_id}的项`);
+          return;
         }
       }
     }
   }
 
   _excludeResult() {
-    const excludeList = this.toteaGroup.excludeList
+    const excludeList = this.toteaGroup.excludeList;
 
     if (excludeList && excludeList.length > 0) {
-      return excludeList.map(s => '-' + s).join(' ')
+      return excludeList.map((s) => "-" + s).join(" ");
     }
 
-    return null
+    return null;
   }
 
   _joinResult() {
-    const joinList = Object.keys(this.toteaGroup.refConfig)
+    const joinList = Object.keys(this.toteaGroup.refConfig);
 
-    return joinList
+    return joinList;
   }
 
   _assignMiddleware() {
-    const THIS = this
+    const THIS = this;
     // this.schema.pre('validate', function (next) {
     //   THIS._checkCreate(this, next)
     // })
 
-    this.schema.pre('update', function (next) {
-      THIS._checkUpdate(this, this, next)
-    })
+    this.schema.pre("update", function (next) {
+      THIS._checkUpdate(this, this, next);
+    });
 
-    this.schema.pre('findOneAndUpdate', function (next) {
-      THIS._checkUpdate(this.getUpdate(), this, next)
-    })
+    this.schema.pre("findOneAndUpdate", function (next) {
+      THIS._checkUpdate(this.getUpdate(), this, next);
+    });
 
-    this.schema.pre('findOneAndRemove', async function (next) {
+    this.schema.pre("findOneAndRemove", async function (next) {
       // call before delete hook
       if (isFunc(THIS.toteaGroup.beforeDeleteCaller)) {
-        await THIS.toteaGroup.beforeDeleteCaller(this._conditions)
+        await THIS.toteaGroup.beforeDeleteCaller(this._conditions);
       }
-      await next()
+      await next();
       // call after delete hook
       if (isFunc(THIS.toteaGroup.afterDeleteCaller)) {
-        await THIS.toteaGroup.beforeDeleteCaller(this._conditions)
+        await THIS.toteaGroup.beforeDeleteCaller(this._conditions);
       }
-    })
+    });
 
-    this.schema.pre('find', function (next) {
-      const exclude = THIS._excludeResult()
-      if (exclude) this.select(exclude)
+    this.schema.pre("find", function (next) {
+      const exclude = THIS._excludeResult();
+      if (exclude) this.select(exclude);
 
-      const join = THIS._joinResult()
+      const join = THIS._joinResult();
       if (join.length > 0) {
         for (const j of join) {
-          this.populate(j)
+          this.populate(j);
         }
       }
 
-      next()
-    })
+      next();
+    });
   }
 
   _mappingModelMethod() {
     const array = [
-      'find',
-      'findById',
-      'findOne',
-      'countDocuments',
-      'findOneAndRemove',
-      'findByIdAndRemove',
-      'update',
-      'updateMany',
-      'updateOne'
-    ]
+      "find",
+      "findById",
+      "findOne",
+      "countDocuments",
+      "findOneAndRemove",
+      "findByIdAndRemove",
+      "update",
+      "updateMany",
+      "updateOne",
+    ];
 
     for (const method of array) {
-      this[method] = this.model[method].bind(this.model)
+      this[method] = this.model[method].bind(this.model);
     }
   }
 }
 
-module.exports = ToteaModel
+module.exports = ToteaModel;

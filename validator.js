@@ -1,7 +1,7 @@
 const FastestValidator = require("fastest-validator");
 const validator = new FastestValidator({
   messages: {
-    required: "{field}必填",
+    required: "必填项:{field}",
 
     string: "{field}字段必须为字符串",
     stringEmpty: "{field}字段不能为空",
@@ -115,5 +115,5 @@ function getValidatorMessage(type, field = "", expected, actual) {
 
 module.exports = {
   validator,
-  getValidatorMessage
+  getValidatorMessage,
 };
