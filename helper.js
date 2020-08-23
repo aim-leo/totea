@@ -1,94 +1,97 @@
 function whatType(obj) {
-  return Object.prototype.toString.call(obj)
+  return Object.prototype.toString.call(obj);
 }
 
 function isType(...objs) {
   return (
-    objs.map(item => whatType(item) === whatType(objs[0])).filter(item => !item)
-      .length === 0
-  )
+    objs
+      .map((item) => whatType(item) === whatType(objs[0]))
+      .filter((item) => !item).length === 0
+  );
 }
 
 function isObject(...objs) {
-  return isType(...objs, {})
+  return isType(...objs, {});
 }
 
 function isArray(...objs) {
-  return isType(...objs, [])
+  return isType(...objs, []);
 }
 
 function isOb(...objs) {
-  return objs.every(obj => inType(obj, [{}, []]))
+  return objs.every((obj) => inType(obj, [{}, []]));
 }
 
 function isBoolean(...objs) {
-  return isType(...objs, true)
+  return isType(...objs, true);
 }
 
 function isString(...objs) {
-  return isType(...objs, '')
+  return isType(...objs, "");
 }
 
 function isNumber(...objs) {
-  return isType(...objs, 1) && !isNaN(...objs)
+  return isType(...objs, 1) && !isNaN(...objs);
 }
 
 function isSymbol(...objs) {
-  return isType(...objs, Symbol('Symbol'))
+  return isType(...objs, Symbol("Symbol"));
 }
 
 function isPromise(...objs) {
-  return isType(...objs, Promise.resolve())
+  return isType(...objs, Promise.resolve());
 }
 
 function isNaN(...objs) {
-  return objs.every(obj => Number.isNaN(obj))
+  return objs.every((obj) => Number.isNaN(obj));
 }
 
 function isNull(...objs) {
-  return isType(...objs, null)
+  return isType(...objs, null);
 }
 
 function isUndef(...objs) {
-  return isType(...objs, undefined)
+  return isType(...objs, undefined);
 }
 
 function isReg(...objs) {
-  return isType(...objs, /d/)
+  return isType(...objs, /d/);
 }
 
 function isNil(...objs) {
-  return objs.every(obj => inType(obj, [undefined, null]))
+  return objs.every((obj) => inType(obj, [undefined, null]));
 }
 
 function isFunction(...objs) {
-  return objs.every(obj => isType(obj, () => {}))
+  return objs.every((obj) => isType(obj, () => {}));
 }
 
 function isAsyncFunction(...objs) {
-  return objs.every(obj => isType(obj, async () => {}))
+  return objs.every((obj) => isType(obj, async () => {}));
 }
 
 function isFunc(...objs) {
-  return objs.every(obj => inType(obj, [() => {}, async () => {}]))
+  return objs.every((obj) => inType(obj, [() => {}, async () => {}]));
 }
 
 function isImagePath(...objs) {
-  return objs.every(obj => /\.(png|jpg|gif|jpeg|webp|bmp|psd|tiff|tga|eps)$/.test(obj))
+  return objs.every((obj) =>
+    /\.(png|jpg|gif|jpeg|webp|bmp|psd|tiff|tga|eps)$/.test(obj)
+  );
 }
 
 function inType(params, list) {
   if (!isType(list, [])) {
-    throw new Error(`list expect a ${whatType([])}`)
+    throw new Error(`list expect a ${whatType([])}`);
   }
-  let flag = false
+  let flag = false;
   for (const i in list) {
     if (isType(list[i], params)) {
-      flag = true
-      break
+      flag = true;
+      break;
     }
   }
-  return flag
+  return flag;
 }
 
 function removeEmpty(
@@ -99,61 +102,62 @@ function removeEmpty(
     removeNaN = true,
     removeEmptyString = true,
     removeEmptyArray = true,
-    removeFalse = true
+    removeFalse = true,
   } = {}
 ) {
-  if (!isObject(obj)) throw new Error('expected a object')
+  if (!isObject(obj)) throw new Error("expected a object");
 
-  const result = {}
+  const result = {};
   for (const key in obj) {
-    const val = obj[key]
+    const val = obj[key];
     if (removeUndefined && isUndef(val)) {
-      continue
+      continue;
     }
 
     if (removeNull && isNull(val)) {
-      continue
+      continue;
     }
 
     if (removeNaN && isNaN(val)) {
-      continue
+      continue;
     }
 
-    if (removeEmptyString && val === '') {
-      continue
+    if (removeEmptyString && val === "") {
+      continue;
     }
 
     if (removeEmptyArray && isArray(val) && val.length === 0) {
-      continue
+      continue;
     }
 
     if (removeFalse && val === false) {
-      continue
+      continue;
     }
 
-    result[key] = val
+    result[key] = val;
   }
 
-  return result
+  return result;
 }
 
 function randomString(L = 8) {
-  let s = ''
+  let s = "";
   const randomchar = () => {
-    const n = Math.floor(Math.random() * 62)
-    if (n < 10) return n // 1-10
-    if (n < 36) return String.fromCharCode(n + 55) // A-Z
-    return String.fromCharCode(n + 61) // a-z
-  }
-  while (s.length < L) s += randomchar()
-  return s
+    const n = Math.floor(Math.random() * 62);
+    if (n < 10) return n; // 1-10
+    if (n < 36) return String.fromCharCode(n + 55); // A-Z
+    return String.fromCharCode(n + 61); // a-z
+  };
+  while (s.length < L) s += randomchar();
+  return s;
 }
 
 function defineEnumerablePropertry(target, key, value) {
   Object.defineProperty(target, key, {
     value,
-    enumerable: false
-  })
+    enumerable: false,
+    writable: true,
+  });
 }
 
 module.exports = {
@@ -182,5 +186,5 @@ module.exports = {
   removeEmpty,
   randomString,
 
-  defineEnumerablePropertry
-}
+  defineEnumerablePropertry,
+};

@@ -474,6 +474,45 @@ class Totea {
     return rule;
   }
 
+  toProtoJson() {
+    // only convert own prop
+    const proto = {};
+    Object.keys(this).map((prop) => {
+      let value = this[prop];
+
+      if (prop === "_validator") {
+        value = this._validator.map(({ func, ...params }) => ({
+          func: func.toString(),
+          ...params,
+        }));
+      }
+
+      proto[prop] = value;
+    });
+
+    return proto;
+  }
+
+  fromProtoJson(proto) {
+    function str2func(obj) {
+      return Function('"use strict";return (' + obj + ")")();
+    }
+    for (const prop in proto) {
+      let value = proto[prop];
+
+      if (prop === "_validator") {
+        value = value.map(({ func, ...params }) => ({
+          func: str2func(func),
+          ...params,
+        }));
+      }
+
+      this[prop] = value;
+    }
+
+    return this;
+  }
+
   getRefConfig() {
     return {
       ref: this._ref,
@@ -543,17 +582,19 @@ class Totea {
 }
 
 class ToteaGroup {
+  static hooks = [
+    "beforeCreate",
+    "afterCreate",
+    "beforeUpdate",
+    "afterUpdate",
+    "beforeDelete",
+    "afterDelete",
+  ];
+
   constructor(tree) {
     this.tree = tree;
 
-    this._mappingHooks(
-      "beforeCreate",
-      "afterCreate",
-      "beforeUpdate",
-      "afterUpdate",
-      "beforeDelete",
-      "afterDelete"
-    );
+    this._mappingHooks();
   }
 
   get refDbList() {
@@ -631,6 +672,50 @@ class ToteaGroup {
     }
 
     return result;
+  }
+
+  toProtoJsonString() {
+    const tree = {};
+    for (const key in this.tree) {
+      const totea = this.tree[key];
+
+      if (!(totea instanceof Totea)) continue;
+
+      // if is virtual prop, ignore it
+      if (totea._virtualFn) continue;
+
+      tree[key] = totea.toProtoJson();
+    }
+
+    return JSON.stringify({
+      tree,
+    });
+  }
+
+  fromProtoJsonString(str) {
+    let tree = {};
+
+    try {
+      const json = JSON.parse(str);
+      tree = json.tree;
+    } catch (e) {
+      throw new Error("[fromProtoJsonString] str is not a valid json str");
+    }
+
+    // clear tree
+    this.tree = {};
+    // clear hooks
+    this._clearHooks();
+    // format tree
+    for (const key in tree) {
+      const totea = new Totea();
+
+      totea.fromProtoJson(tree[key]);
+
+      this.tree[key] = totea;
+    }
+
+    return this;
   }
 
   toCreateFormShema() {
@@ -819,8 +904,8 @@ class ToteaGroup {
     }
   }
 
-  _mappingHooks(...list) {
-    for (const hook of list) {
+  _mappingHooks() {
+    for (const hook of ToteaGroup.hooks) {
       if (!isString(hook)) {
         throw new Error("hook name expected a string");
       }
@@ -844,6 +929,16 @@ class ToteaGroup {
           this[`_${hook}`].unshift(callback);
         }
       };
+    }
+  }
+
+  _clearHooks() {
+    for (const hook of ToteaGroup.hooks) {
+      if (!isString(hook)) {
+        throw new Error("hook name expected a string");
+      }
+
+      this[`_${hook}`] = [];
     }
   }
 }

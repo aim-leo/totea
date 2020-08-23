@@ -1,125 +1,119 @@
-const importModules = require('import-modules')
-const path = require('path')
-const merge = require('deepmerge')
+const importModules = require("import-modules");
+const path = require("path");
+const merge = require("deepmerge");
+const { stringify } = require("telejson");
 
-const express = require('./express')
-const { isString, isObject, isFunc, isArray } = require('./helper')
+const express = require("./express");
+const { isString, isObject, isFunc, isArray } = require("./helper");
 
-const ToteaService = require('./service')
-const ToteaControoler = require('./controller')
-const { parseRequestParams } = require('./middleware')
-const createUpload = require('./upload')
+const ToteaService = require("./service");
+const ToteaControoler = require("./controller");
+const { parseRequestParams } = require("./middleware");
+const createUpload = require("./upload");
 
 function formatFileName(file) {
   if (!isString(file)) {
-    throw new Error('file name expected a string type')
+    throw new Error("file name expected a string type");
   }
-  return file.split('.').slice(0, -1).join('-')
+  return file.split(".").slice(0, -1).join("-");
 }
 
 function readFileList(dir, reg) {
-  const fs = require('fs')
-  const path = require('path')
+  const fs = require("fs");
+  const path = require("path");
 
   if (isNil(dir) || !isString(dir)) {
-    throw new Error('dir expecetd a string type')
+    throw new Error("dir expecetd a string type");
   }
 
   if (isString(reg)) {
-    reg = new RegExp(`.${reg}$`)
+    reg = new RegExp(`.${reg}$`);
   }
 
   if (!isUndef(reg) && !isReg(reg)) {
-    throw new Error('dir expecetd undefined or a reg type')
+    throw new Error("dir expecetd undefined or a reg type");
   }
 
-  const fileList = fs.readdirSync(dir)
+  const fileList = fs.readdirSync(dir);
 
-  const result = []
+  const result = [];
 
   for (const file of fileList) {
-    const p = path.join(dir, file)
-    const stat = fs.statSync(p)
+    const p = path.join(dir, file);
+    const stat = fs.statSync(p);
 
     if (!stat.isFile()) {
-      continue
+      continue;
     }
 
     if (reg && !reg.test(file)) {
-      continue
+      continue;
     }
 
-    result.push(file)
+    result.push(file);
   }
 
-  result.toObject = function() {
-    const r = {}
+  result.toObject = function () {
+    const r = {};
     for (const f of result) {
-      const name = formatFileName(f)
+      const name = formatFileName(f);
 
-      if (!name) throw new Error('name is empty!')
+      if (!name) throw new Error("name is empty!");
 
-      r[name] = f
+      r[name] = f;
     }
 
-    return r
-  }
+    return r;
+  };
 
-  return result
+  return result;
 }
 
 class ToteaRoute {
-  constructor({
-    src = '.',
-    router,
-    middleware = {},
-    interceptors = []
-  } = {}) {
+  constructor({ src = ".", router, middleware = {}, interceptors = [] } = {}) {
     if (!isString(src)) {
-      throw new Error(
-        `src expected a string, but get a ${src}`
-      )
+      throw new Error(`src expected a string, but get a ${src}`);
     }
 
     if (!isFunc(router)) {
-      throw new Error(
-        `router expected a express.router, but get a ${src}`
-      )
+      throw new Error(`router expected a express.router, but get a ${src}`);
     }
 
     if (!isObject(middleware)) {
-      throw new Error(`middleware expected a object, but get a ${middleware}`)
+      throw new Error(`middleware expected a object, but get a ${middleware}`);
     }
 
     if (isFunc(interceptors)) {
-      this._interceptors = [interceptors]
+      this._interceptors = [interceptors];
     } else if (isArray(interceptors)) {
-      this._interceptors = interceptors
+      this._interceptors = interceptors;
     } else {
-      throw new Error(`interceptors expected a array | function, but get a ${interceptors}`)
+      throw new Error(
+        `interceptors expected a array | function, but get a ${interceptors}`
+      );
     }
 
-    this._router = router
+    this._router = router;
 
-    this._middleware = middleware
+    this._middleware = middleware;
 
-    this._controllers = importModules(this._getPath(src, 'controller'))
-    this._services = importModules(this._getPath(src, 'service'))
-    this._models = importModules(this._getPath(src, 'model'))
+    this._controllers = importModules(this._getPath(src, "controller"));
+    this._services = importModules(this._getPath(src, "service"));
+    this._models = importModules(this._getPath(src, "model"));
 
-    this._staticPath = this._getPath(src, 'static')
+    this._staticPath = this._getPath(src, "static");
 
-    this._mappingGuardAndShip()
+    this._mappingGuardAndShip();
   }
 
   route(routeName, { middleware = {} } = {}) {
-    return this._formatRoute(routeName, merge(this._middleware, middleware))
+    return this._formatRoute(routeName, merge(this._middleware, middleware));
   }
 
   injectModel() {
     // inject route from model
     for (const key in this._models) {
-      this._router.use('/' + key, this.route(key))
+      this._router.use("/" + key, this.route(key));
     }
   }
 
@@ -128,32 +122,37 @@ class ToteaRoute {
   // it is not recommand
   injectStatic() {
     // inject page from static
-    const staticList = readFileList(this._staticPath).toObject()
+    const staticList = readFileList(this._staticPath).toObject();
     for (const key in staticList) {
-      this._router.get('/' + (key === 'index' ? '' : key), (req, res, next) => {
-        res.sendFile(staticList[key], { root: this._staticPath })
-      })
+      this._router.get("/" + (key === "index" ? "" : key), (req, res, next) => {
+        res.sendFile(staticList[key], { root: this._staticPath });
+      });
     }
   }
 
-  injectUpload(list = [], prefix = 'upload') {
+  injectUpload(list = [], prefix = "upload") {
     if (!isArray(list)) {
-      throw new Error('list expected a array')
+      throw new Error("list expected a array");
     }
     for (const u of list) {
-      let obj = {}
+      let obj = {};
       if (isString(u)) {
         obj = {
           name: u,
-          folder: u
-        }
-      } else if (isObject(u) && u.hasOwnProperty('name')) {
-        obj = u
+          folder: u,
+        };
+      } else if (isObject(u) && u.hasOwnProperty("name")) {
+        obj = u;
       } else {
-        throw new Error('list expected a array include string or { name: [name], folder?: [folder] } typed object')
+        throw new Error(
+          "list expected a array include string or { name: [name], folder?: [folder] } typed object"
+        );
       }
 
-      this._router.use(`/${prefix}/${obj.name}`, createUpload(obj.name, obj.folder))
+      this._router.use(
+        `/${prefix}/${obj.name}`,
+        createUpload(obj.name, obj.folder)
+      );
     }
   }
 
@@ -161,111 +160,113 @@ class ToteaRoute {
     // apply interceptors
     for (const g of this._interceptors) {
       if (!isFunc(g)) {
-        throw new Error(`interceptors expected a array<function> or a function`)
+        throw new Error(
+          `interceptors expected a array<function> or a function`
+        );
       }
-      this._router.use(g)
+      this._router.use(g);
     }
   }
 
   _formatRoute(routeName, middleware = {}) {
     if (!isString(routeName)) {
-      throw new Error(`routeName expected a string, but get a ${routeName}`)
+      throw new Error(`routeName expected a string, but get a ${routeName}`);
     }
 
     if (!isObject(middleware)) {
-      throw new Error(`middleware expected a object, but get a ${middleware}`)
+      throw new Error(`middleware expected a object, but get a ${middleware}`);
     }
 
     // check model exist
     if (!(routeName in this._models)) {
-      throw new Error(`Attempt to find model under ../model, but get none`)
+      throw new Error(`Attempt to find model under ../model, but get none`);
     }
 
-    const controller = this._importController(routeName)
+    const controller = this._importController(routeName);
 
-    const router = express.Router()
+    const router = express.Router();
 
     function mappingMiddleware(type) {
-      const m = middleware[type] || []
+      const m = middleware[type] || [];
       if (isFunc(m)) {
-        return [m]
+        return [m];
       } else if (isArray(m)) {
-        return m
+        return m;
       }
 
       throw new Error(
         `middleware[${type}] expected a array<function> or a function`
-      )
+      );
     }
 
     router
-      .route('/')
+      .route("/")
       .get(
         parseRequestParams,
-        ...mappingMiddleware('query'),
+        ...mappingMiddleware("query"),
         async (req, res, next) => {
-          controller.jsonWrite(next, res, await controller.query(req.query))
+          controller.jsonWrite(next, res, await controller.query(req.query));
         }
       )
-      .post(...mappingMiddleware('insert'), async (req, res, next) => {
-        controller.jsonWrite(next, res, await controller.insert(req.body))
-      })
+      .post(...mappingMiddleware("insert"), async (req, res, next) => {
+        controller.jsonWrite(next, res, await controller.insert(req.body));
+      });
     router
-      .route('/:id')
-      .get(...mappingMiddleware('queryById'), async (req, res, next) => {
+      .route("/:id")
+      .get(...mappingMiddleware("queryById"), async (req, res, next) => {
         controller.jsonWrite(
           next,
           res,
           await controller.queryById(req.params.id)
-        )
+        );
       })
-      .delete(...mappingMiddleware('deleteById'), async (req, res, next) => {
+      .delete(...mappingMiddleware("deleteById"), async (req, res, next) => {
         controller.jsonWrite(
           next,
           res,
           await controller.deleteById(req.params.id)
-        )
+        );
       })
-      .patch(...mappingMiddleware('updateById'), async (req, res, next) => {
+      .patch(...mappingMiddleware("updateById"), async (req, res, next) => {
         controller.jsonWrite(
           next,
           res,
           await controller.updateById(req.params.id, req.body)
-        )
-      })
+        );
+      });
 
     // mapping form create page
-    const toteaGroup = this._models[routeName].toteaGroup
-    router
-      .route('/form')
-      .get(
-        async (req, res, next) => {
-          res.render('form', { title: routeName, schema: JSON.stringify(toteaGroup.createFormSchema), action: routeName })
-        }
-      )
+    const toteaGroup = this._models[routeName].toteaGroup;
+    router.route("/form").get(async (req, res, next) => {
+      res.render("form", {
+        title: routeName,
+        toteaGroup: stringify(toteaGroup),
+        action: routeName,
+      });
+    });
 
     // at last, write json
     router.use((req, res, next) => {
-      controller.jsonRes(res, res.preRes)
-    })
+      controller.jsonRes(res, res.preRes);
+    });
 
-    return router
+    return router;
   }
 
   _importController(routeName) {
     // import model
-    const model = this._models[routeName]
-    const service = this._services[routeName] || new ToteaService(model)
+    const model = this._models[routeName];
+    const service = this._services[routeName] || new ToteaService(model);
 
     const controller =
-      this._controllers[routeName] || new ToteaControoler(service)
+      this._controllers[routeName] || new ToteaControoler(service);
 
-    return controller
+    return controller;
   }
 
   _getPath(src, dir) {
-    return path.join(src, dir)
+    return path.join(src, dir);
   }
 }
 
-module.exports = ToteaRoute
+module.exports = ToteaRoute;
