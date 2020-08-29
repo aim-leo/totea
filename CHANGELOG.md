@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.13.0](https://github.com/aim-leo/totea/compare/v1.12.1...v1.13.0) (2020-08-29)
+
+### Features
+
+- 🎸 add toProtoJson && formProtoJson for types.js ([fdada9d](https://github.com/aim-leo/totea/commit/fdada9d91c45d1ee62a54be1d6a70a6bf5955bf6))
+- 🎸 tmp add toProtoJson for types.js ([9b9ffda](https://github.com/aim-leo/totea/commit/9b9ffdafff6e71f65515b2e6c90342996d092d8f))
+
 ### [1.12.1](https://github.com/aim-leo/totea/compare/v1.12.0...v1.12.1) (2020-08-20)
 
 ### Bug Fixes
