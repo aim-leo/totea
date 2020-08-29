@@ -34,6 +34,7 @@
     "build": "node_modules/webpack/bin/webpack.js --config build/webpack.config.js --mode production"
   },
   "dependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.10.4",
     "cookie-parser": "~1.4.3",
     "cors": "^2.8.5",
     "deepmerge": "^4.2.2",

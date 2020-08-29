@@ -1,6 +1,6 @@
 const {
   isNumber,
-  isUndef,
+  isNil,
   isReg,
   isString,
   isFunc,
@@ -11,39 +11,46 @@ const {
   isArray,
   removeEmpty,
   defineEnumerablePropertry,
+  class2str,
+  str2class,
+  isOb,
+  str2reg,
 } = require("./helper");
 
 const { validator, getValidatorMessage } = require("./validator");
 
 class Totea {
   constructor() {
-    this._type = undefined;
+    this._type = null;
     this._required = false;
     this._unique = false;
-    this._min = undefined;
-    this._max = undefined;
-    this._name = undefined;
+    this._min = null;
+    this._max = null;
+    this._name = null;
+    this._length = null;
 
-    this._childType = undefined; // for array type
+    this._childType = null; // for array type
 
     this._forbidCreate = false;
     this._forbidUpdate = false;
 
     this._ref = null;
-    this._refFilter = undefined;
+    this._refFilter = null;
 
     this._exclude = false;
 
     this._virtualFn = null;
     this._computedFn = null;
 
-    this._cate = undefined;
-    this._formType = undefined;
+    this._cate = null;
+    this._formType = null;
     this._validator = [];
+
+    // this._parttern = null;
   }
 
   get isFinalise() {
-    if (isUndef(this._type)) {
+    if (isNil(this._type)) {
       return false;
     }
 
@@ -70,32 +77,39 @@ class Totea {
     return this.getRefConfig();
   }
 
+  type(t) {
+    this._type = class2str(t);
+
+    return this;
+  }
+
   string() {
-    this._type = String;
+    this.type("string");
 
     return this;
   }
 
   number() {
-    this._type = Number;
+    this.type("number");
 
     return this;
   }
 
   boolean() {
-    this._type = Boolean;
+    this.type("boolean");
 
     return this;
   }
 
   date() {
-    this._type = Date;
+    this.type("date");
 
     return this;
   }
 
   objectId() {
-    this._type = String;
+    this.string();
+
     this._length = 24;
     this._cate = "id";
 
@@ -104,11 +118,11 @@ class Totea {
 
   enum(values, msg) {
     if (isNumber(...values)) {
-      this._type = Number;
+      this.number();
     } else if (isBoolean(...values)) {
-      this._type = Boolean;
+      this.boolean();
     } else {
-      this._type = String;
+      this.string();
     }
     return this.validate(
       (val) => values.some((v) => v === val),
@@ -117,9 +131,9 @@ class Totea {
   }
 
   array(childType, enums, msg) {
-    this._type = Array;
+    this.type("array");
 
-    this._childType = childType;
+    this._childType = str2class(childType);
 
     if (enums && isArray(enums)) {
       this.validate(
@@ -167,7 +181,7 @@ class Totea {
   }
 
   min(num) {
-    if (!isUndef(num) && !isNumber(num)) {
+    if (!isNumber(num)) {
       throw new Error(`min expected a number, but get a ${num}`);
     }
 
@@ -177,7 +191,7 @@ class Totea {
   }
 
   max(num) {
-    if (!isUndef(num) && !isNumber(num)) {
+    if (!isNumber(num)) {
       throw new Error(`max expected a number, but get a ${num}`);
     }
 
@@ -187,11 +201,20 @@ class Totea {
   }
 
   parttern(p, msg) {
+    // if (this._parttern) {
+    //   throw new Error(`parttern has seted, and can not override`);
+    // }
+
     if (!isReg(p)) {
       throw new Error(`expected a regexp, but get a ${p}`);
     }
 
-    this.validate((val) => p.test(val), msg || `${this._name}值正则校验不通过`);
+    // this._parttern = {
+    //   reg: p,
+    //   msg: msg || `${this._name}值正则校验不通过`,
+    // };
+
+    this.validate((val) => p.test(val), msg);
 
     return this;
   }
@@ -297,7 +320,7 @@ class Totea {
       (isCreate && this._forbidCreate) || (!isCreate && this._forbidUpdate);
 
     const result = removeEmpty({
-      type: isForbid ? "forbidden" : this._class2Type(this._type)[0],
+      type: isForbid ? "forbidden" : this._type,
       min: this._min,
       max: this._max,
       length: this._length,
@@ -305,8 +328,8 @@ class Totea {
       validator: this._validator,
     });
 
-    if (this._type === Array && this._childType) {
-      result.items = this._class2Type(this._childType)[0];
+    if (this._type === "array" && this._childType) {
+      result.items = class2str(this._childType);
     }
 
     this._assignMessage(result);
@@ -315,11 +338,11 @@ class Totea {
   }
 
   toSchema() {
-    if (this._type === Array && this._childType) {
+    if (this._type === "array" && this._childType) {
       return [
         this._childType.hasOwnProperty("type")
-          ? this._childType
-          : { type: this._childType },
+          ? str2class(this._childType)
+          : { type: str2class(this._childType) },
       ];
     }
 
@@ -356,15 +379,15 @@ class Totea {
       delete result.childs;
     }
 
-    if (!isUndef(this._min)) {
+    if (!isNil(this._min)) {
       result.attrs.min = this._min;
     }
 
-    if (!isUndef(this._max)) {
+    if (!isNil(this._max)) {
       result.attrs.max = this._max;
     }
 
-    if (!isUndef(this._length)) {
+    if (!isNil(this._length)) {
       result.attrs.length = this._length;
     }
 
@@ -397,7 +420,7 @@ class Totea {
       );
     }
 
-    const type = this._class2Type(this._type)[0];
+    const type = class2str(this._type);
 
     // assign type
     if (type) {
@@ -411,7 +434,7 @@ class Totea {
     }
 
     // assign length
-    if (this._length !== undefined && ["string", "array"].includes(type)) {
+    if (!isNil(this._length) && ["string", "array"].includes(type)) {
       rule.push(
         ...toRuleList({
           type,
@@ -426,10 +449,7 @@ class Totea {
     }
 
     // assign min, max
-    if (
-      this._min !== undefined &&
-      ["string", "number", "array"].includes(type)
-    ) {
+    if (!isNil(this._min) && ["string", "number", "array"].includes(type)) {
       rule.push(
         ...toRuleList({
           type,
@@ -438,10 +458,7 @@ class Totea {
         })
       );
     }
-    if (
-      this._max !== undefined &&
-      ["string", "number", "array"].includes(type)
-    ) {
+    if (!isNil(this._max) && ["string", "number", "array"].includes(type)) {
       rule.push(
         ...toRuleList({
           type,
@@ -450,6 +467,17 @@ class Totea {
         })
       );
     }
+
+    // assign parttern
+    // if (!isNil(this._parttern)) {
+    //   rule.push(
+    //     ...toRuleList({
+    //       type,
+    //       pattern: this._parttern.reg,
+    //       message: this._parttern.msg,
+    //     })
+    //   );
+    // }
 
     // assign addtional validator
     if (this._validator.length > 0) {
@@ -474,37 +502,33 @@ class Totea {
     return rule;
   }
 
-  toProtoJson() {
+  toProtoJson(excludeList = []) {
+    if (!isArray(excludeList)) {
+      throw new Error("excludeList expected a array");
+    }
     // only convert own prop
     const proto = {};
-    Object.keys(this).map((prop) => {
+    for (const prop of Object.keys(this)) {
       let value = this[prop];
 
-      if (prop === "_validator") {
-        value = this._validator.map(({ func, ...params }) => ({
-          func: func.toString(),
-          ...params,
-        }));
-      }
+      if (excludeList.includes(prop)) continue;
 
+      if (proto === "_childType") {
+        proto[prop] = class2str(value);
+        continue;
+      }
       proto[prop] = value;
-    });
+    }
 
     return proto;
   }
 
   fromProtoJson(proto) {
-    function str2func(obj) {
-      return Function('"use strict";return (' + obj + ")")();
-    }
     for (const prop in proto) {
       let value = proto[prop];
 
-      if (prop === "_validator") {
-        value = value.map(({ func, ...params }) => ({
-          func: str2func(func),
-          ...params,
-        }));
+      if (prop === "_childType" && !isNil(value)) {
+        this[prop] = str2class(value);
       }
 
       this[prop] = value;
@@ -547,37 +571,7 @@ class Totea {
           : undefined,
     };
 
-    const [type, typeName] = this._class2Type(this._type);
-
-    if (type !== "any") {
-      messages[type] = `${this._name}类型错误,请输入${typeName}`;
-    }
-
     json.messages = removeEmpty(messages);
-  }
-
-  _class2Type(c) {
-    // if type is { type: TYPE }
-    if (isObject(c) && c.hasOwnProperty("type")) {
-      return this._class2Type(c.type);
-    }
-
-    switch (c) {
-      case String:
-        return ["string", "字符串类型"];
-      case Boolean:
-        return ["boolean", "布尔类型"];
-      case Date:
-        return ["date", "日期类型"];
-      case Number:
-        return ["number", "数字类型"];
-      // case ObjectId:
-      //   return ['objectId', 'id']
-      case Array:
-        return ["array", "数组"];
-      default:
-        return ["any"];
-    }
   }
 }
 
@@ -674,32 +668,28 @@ class ToteaGroup {
     return result;
   }
 
-  toProtoJsonString() {
+  toProtoJson(excludeList = []) {
+    if (!isArray(excludeList)) {
+      throw new Error("excludeList expected a array");
+    }
+
     const tree = {};
     for (const key in this.tree) {
       const totea = this.tree[key];
 
       if (!(totea instanceof Totea)) continue;
 
-      // if is virtual prop, ignore it
-      if (totea._virtualFn) continue;
-
-      tree[key] = totea.toProtoJson();
+      tree[key] = totea.toProtoJson(excludeList);
     }
 
-    return JSON.stringify({
+    return {
       tree,
-    });
+    };
   }
 
-  fromProtoJsonString(str) {
-    let tree = {};
-
-    try {
-      const json = JSON.parse(str);
-      tree = json.tree;
-    } catch (e) {
-      throw new Error("[fromProtoJsonString] str is not a valid json str");
+  fromProtoJson({ tree }) {
+    if (!tree || !isObject(tree)) {
+      throw new Error("[fromProtoJson] expected a json like { tree: {} }");
     }
 
     // clear tree

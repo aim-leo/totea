@@ -1,12 +1,22 @@
 #!/usr/bin/env node
 global.ROOT = __dirname
 
+const path = require('path')
+
 const { ToteaServer } = require('../index')
 
 class Server extends ToteaServer{
   customizeRouter(router) {
     router.get('/', (req, res, next) => {
       res.send('totea server is running!')
+    })
+
+    router.get('/totea-types.js', (req, res, next) => {
+      res.sendFile(path.join(__dirname, '../dist/totea-types.js'));
+    })
+
+    router.get('/telejson.js', (req, res, next) => {
+      res.sendFile(path.join(__dirname, 'public/telejson.js'));
     })
   }
 

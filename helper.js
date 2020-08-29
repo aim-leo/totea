@@ -160,6 +160,70 @@ function defineEnumerablePropertry(target, key, value) {
   });
 }
 
+function class2str(c) {
+  // if type is { type: TYPE }
+  if (isObject(c) && c.hasOwnProperty("type")) {
+    return class2str(c.type);
+  }
+
+  // if not a class
+  if (isString(c)) return c;
+
+  switch (c) {
+    case String:
+      return "string";
+    case Boolean:
+      return "boolean";
+    case Date:
+      return "date";
+    case Number:
+      return "number";
+    case Function:
+      return "function";
+    case Array:
+      return "array";
+    default:
+      return "any";
+  }
+}
+
+function str2class(c) {
+  // if type is { type: TYPE }
+  if (isObject(c) && c.hasOwnProperty("type")) {
+    return str2class(c.type);
+  }
+
+  // if is a class
+  if (isFunc(c)) return c;
+
+  switch (c) {
+    case "string":
+      return String;
+    case "boolean":
+      return Boolean;
+    case "date":
+      return Date;
+    case "number":
+      return Number;
+    case "function":
+      return Function;
+    case "array":
+      return Array;
+  }
+}
+
+function reg2str(reg) {
+  return `_regexp_${reg.flags}|${reg.source}`;
+}
+
+function str2reg(value) {
+  if (typeof value === "string" && value.startsWith("_regexp_")) {
+    // this split isn't working correctly
+    const [, flags, source] = value.match(/_regexp_([^|]*)\|(.*)/) || [];
+    return new RegExp(source, flags);
+  }
+}
+
 module.exports = {
   whatType,
   isType,
@@ -187,4 +251,10 @@ module.exports = {
   randomString,
 
   defineEnumerablePropertry,
+
+  class2str,
+  str2class,
+
+  reg2str,
+  str2reg,
 };

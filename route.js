@@ -1,7 +1,7 @@
 const importModules = require("import-modules");
 const path = require("path");
 const merge = require("deepmerge");
-const { stringify } = require("telejson");
+const { stringify, parse } = require("telejson");
 
 const express = require("./express");
 const { isString, isObject, isFunc, isArray } = require("./helper");
@@ -237,10 +237,13 @@ class ToteaRoute {
 
     // mapping form create page
     const toteaGroup = this._models[routeName].toteaGroup;
+
     router.route("/form").get(async (req, res, next) => {
       res.render("form", {
         title: routeName,
-        toteaGroup: stringify(toteaGroup),
+        toteaGroupJsonString: JSON.stringify(
+          toteaGroup.toProtoJson(["_parttern", "_validator"])
+        ),
         action: routeName,
       });
     });

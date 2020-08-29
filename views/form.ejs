@@ -42,7 +42,8 @@
       <totea-form
         v-model="form"
         :schema="schema"
-        action="<%=action%>"
+        :rules="rules"
+        :action="action"
         base-url="http://localhost:3000"
         @comfirm="onComfirm"
       >
@@ -51,13 +52,19 @@
     <script src="https://cdn.jsdelivr.net/npm/axios@0.19.0/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/element-ui@2.10.0/lib/index.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/totea-form/dist/totea-form.js"></script>
+    <script src="http://localhost:3000/totea-types.js"></script>
     <script>
+      const toteaGroup = new toteaTypes.ToteaGroup()
+      toteaGroup.fromProtoJson(JSON.parse('<%-toteaGroupJsonString%>'))
+
       new Vue({
         el: "#app",
         data() {
           return {
             form: {},
-            schema: JSON.parse('<%-schema%>')
+            schema: toteaGroup.createFormSchema,
+            rules: toteaGroup.toElementRules(),
+            action: '<%=action%>'
           };
         },
         methods: {

@@ -24,14 +24,4 @@ const group = new ToteaGroup({
   email: types.email(),
 });
 
-const json = group.toProtoJsonString();
-
-// console.log(json)
-
-const ng = new ToteaGroup();
-
-ng.fromProtoJsonString(json);
-
-console.log(ng);
-
 module.exports = new Model("post", group);
