@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.14.0](https://github.com/aim-leo/totea/compare/v1.13.0...v1.14.0) (2020-08-30)
+
+### Features
+
+- 🎸 enable to transform parttern to protojson ([9580b33](https://github.com/aim-leo/totea/commit/9580b33bf8b8a4f9f2b5e02acd17418617305ed9))
+
 ## [1.13.0](https://github.com/aim-leo/totea/compare/v1.12.1...v1.13.0) (2020-08-29)
 
 ### Features
