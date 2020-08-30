@@ -13,9 +13,9 @@ const {
   defineEnumerablePropertry,
   class2str,
   str2class,
-  isOb,
-  str2reg,
 } = require("./helper");
+
+const { reg2str, str2reg } = require("./reg2str");
 
 const { validator, getValidatorMessage } = require("./validator");
 
@@ -46,7 +46,7 @@ class Totea {
     this._formType = null;
     this._validator = [];
 
-    // this._parttern = null;
+    this._parttern = null;
   }
 
   get isFinalise() {
@@ -201,20 +201,14 @@ class Totea {
   }
 
   parttern(p, msg) {
-    // if (this._parttern) {
-    //   throw new Error(`parttern has seted, and can not override`);
-    // }
-
     if (!isReg(p)) {
       throw new Error(`expected a regexp, but get a ${p}`);
     }
 
-    // this._parttern = {
-    //   reg: p,
-    //   msg: msg || `${this._name}值正则校验不通过`,
-    // };
-
-    this.validate((val) => p.test(val), msg);
+    this._parttern = {
+      reg: p,
+      msg: msg || `${this._name}值正则校验不通过`,
+    };
 
     return this;
   }
@@ -326,6 +320,7 @@ class Totea {
       length: this._length,
       optional: !this._required || !isCreate,
       validator: this._validator,
+      parttern: this._parttern,
     });
 
     if (this._type === "array" && this._childType) {
@@ -469,15 +464,15 @@ class Totea {
     }
 
     // assign parttern
-    // if (!isNil(this._parttern)) {
-    //   rule.push(
-    //     ...toRuleList({
-    //       type,
-    //       pattern: this._parttern.reg,
-    //       message: this._parttern.msg,
-    //     })
-    //   );
-    // }
+    if (!isNil(this._parttern)) {
+      rule.push(
+        ...toRuleList({
+          type,
+          pattern: this._parttern.reg,
+          message: this._parttern.msg,
+        })
+      );
+    }
 
     // assign addtional validator
     if (this._validator.length > 0) {
@@ -508,30 +503,47 @@ class Totea {
     }
     // only convert own prop
     const proto = {};
-    for (const prop of Object.keys(this)) {
-      let value = this[prop];
+    for (const key of Object.keys(this)) {
+      const value = this[key];
 
-      if (excludeList.includes(prop)) continue;
+      if (excludeList.includes(key)) continue;
 
-      if (proto === "_childType") {
-        proto[prop] = class2str(value);
+      if (key === "_childType" && !isNil(value)) {
+        proto[key] = class2str(value);
         continue;
       }
-      proto[prop] = value;
+
+      if (key === "_parttern" && !isNil(value)) {
+        proto[key] = {
+          reg: reg2str(value.reg),
+          msg: value.msg,
+        };
+        continue;
+      }
+      proto[key] = value;
     }
 
     return proto;
   }
 
   fromProtoJson(proto) {
-    for (const prop in proto) {
-      let value = proto[prop];
+    for (const key in proto) {
+      let value = proto[key];
 
-      if (prop === "_childType" && !isNil(value)) {
-        this[prop] = str2class(value);
+      if (key === "_childType" && !isNil(value)) {
+        this[key] = str2class(value);
+        continue;
       }
 
-      this[prop] = value;
+      if (key === "_parttern" && !isNil(value)) {
+        this[key] = {
+          reg: str2reg(value.reg),
+          msg: value.msg,
+        };
+        continue;
+      }
+
+      this[key] = value;
     }
 
     return this;
@@ -789,11 +801,8 @@ class ToteaGroup {
     return result;
   }
 
-  async validateCreate(params) {
-    const msg = await this._validate(params, "create");
-    // if (!msg) await this._assignDefault(params)
-
-    return msg;
+  validateCreate(params) {
+    return this._validate(params, "create");
   }
 
   validateUpdate(params) {
@@ -817,7 +826,17 @@ class ToteaGroup {
       for (const key in json) {
         const item = json[key];
 
-        if (!item.validator || item.validator.length === 0) {
+        const validator = [...(item.validator || [])];
+
+        // assign _parttern to _validator
+        if (!isNil(item.parttern)) {
+          validator.push({
+            func: (val) => item.parttern.reg.test(val),
+            msg: item.parttern.msg,
+          });
+        }
+
+        if (validator.length === 0) {
           continue;
         }
 
@@ -825,7 +844,7 @@ class ToteaGroup {
           item.optional === true && params.hasOwnProperty(key);
         if (isOptionalAndOfferd || !item.optional) {
           // loop check
-          for (const v of item.validator) {
+          for (const v of validator) {
             const { func, msg } = v;
             const passed = await func(params[key], params);
 

@@ -242,7 +242,7 @@ class ToteaRoute {
       res.render("form", {
         title: routeName,
         toteaGroupJsonString: JSON.stringify(
-          toteaGroup.toProtoJson(["_parttern", "_validator"])
+          toteaGroup.toProtoJson(["_validator"])
         ),
         action: routeName,
       });

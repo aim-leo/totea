@@ -79,10 +79,9 @@
           defineEnumerablePropertry: p,
           class2str: m,
           str2class: y,
-          isOb: g,
-          str2reg: b,
         } = r(1),
-        { validator: _, getValidatorMessage: v } = r(2);
+        { reg2str: g, str2reg: b } = r(2),
+        { validator: _, getValidatorMessage: v } = r(3);
       class x {
         constructor() {
           (this._type = null),
@@ -102,7 +101,8 @@
             (this._computedFn = null),
             (this._cate = null),
             (this._formType = null),
-            (this._validator = []);
+            (this._validator = []),
+            (this._parttern = null);
         }
         get isFinalise() {
           return !i(this._type);
@@ -187,7 +187,13 @@
         }
         parttern(e, t) {
           if (!a(e)) throw new Error("expected a regexp, but get a " + e);
-          return this.validate((t) => e.test(t), t), this;
+          return (
+            (this._parttern = {
+              reg: e,
+              msg: t || this._name + "值正则校验不通过",
+            }),
+            this
+          );
         }
         cate(e) {
           return (this._cate = e), this;
@@ -251,6 +257,7 @@
               length: this._length,
               optional: !this._required || !e,
               validator: this._validator,
+              parttern: this._parttern,
             });
           return (
             "array" === this._type &&
@@ -331,6 +338,14 @@
                   message: v(r + "Max", this._name, this._max),
                 })
               ),
+            i(this._parttern) ||
+              t.push(
+                ...e({
+                  type: r,
+                  pattern: this._parttern.reg,
+                  message: this._parttern.msg,
+                })
+              ),
             this._validator.length > 0 &&
               this._validator.map((n) => {
                 const { func: i, msg: a } = n;
@@ -350,15 +365,24 @@
           if (!f(e)) throw new Error("excludeList expected a array");
           const t = {};
           for (const r of Object.keys(this)) {
-            let n = this[r];
-            e.includes(r) || (t[r] = "_childType" !== t ? n : m(n));
+            const n = this[r];
+            e.includes(r) ||
+              ("_childType" !== r || i(n)
+                ? "_parttern" !== r || i(n)
+                  ? (t[r] = n)
+                  : (t[r] = { reg: g(n.reg), msg: n.msg })
+                : (t[r] = m(n)));
           }
           return t;
         }
         fromProtoJson(e) {
           for (const t in e) {
             let r = e[t];
-            "_childType" !== t || i(r) || (this[t] = y(r)), (this[t] = r);
+            "_childType" !== t || i(r)
+              ? "_parttern" !== t || i(r)
+                ? (this[t] = r)
+                : (this[t] = { reg: b(r.reg), msg: r.msg })
+              : (this[t] = y(r));
           }
           return this;
         }
@@ -514,8 +538,8 @@
           }
           return e;
         }
-        async validateCreate(e) {
-          return await this._validate(e, "create");
+        validateCreate(e) {
+          return this._validate(e, "create");
         }
         validateUpdate(e) {
           return this._validate(e, "update");
@@ -527,10 +551,19 @@
               n = _.validate(e, r);
             if (n && n.length > 0) return n[0].message;
             for (const t in r) {
-              const n = r[t];
-              if (!n.validator || 0 === n.validator.length) continue;
+              const n = r[t],
+                a = [...(n.validator || [])];
+              if (
+                (i(n.parttern) ||
+                  a.push({
+                    func: (e) => n.parttern.reg.test(e),
+                    msg: n.parttern.msg,
+                  }),
+                0 === a.length)
+              )
+                continue;
               if ((!0 === n.optional && e.hasOwnProperty(t)) || !n.optional)
-                for (const r of n.validator) {
+                for (const r of a) {
                   const { func: n, msg: i } = r;
                   if (!1 === (await n(e[t], e))) return i;
                 }
@@ -645,10 +678,10 @@
             .name(e)
             .formType("input"),
         P = (e) => new x().number().name(e),
-        q = (e) => P(e).min(0).formType("int"),
-        N = (e) => new x().date().cate("date").default(Date.now).name(e),
-        R = (e = "创建时间") => N(e),
-        I = (e = "创建时间") => N(e).cate("updateTime"),
+        R = (e) => P(e).min(0).formType("int"),
+        q = (e) => new x().date().cate("date").default(Date.now).name(e),
+        N = (e = "创建时间") => q(e),
+        I = (e = "创建时间") => q(e).cate("updateTime"),
         $ = (e, t) =>
           new x().array(e).name(t).cate("array").formType("dynamic_tags"),
         U = (e, t, r) =>
@@ -663,7 +696,7 @@
           name: j("名称").required(),
           remark: A("备注"),
           logo: L("图片"),
-          createTime: R(),
+          createTime: N(),
           updateTime: I(),
         },
         V = {
@@ -708,11 +741,11 @@
         email: M,
         phone: F,
         date: (e) => new x().date().cate("date").name(e).formType("date"),
-        dateNow: N,
+        dateNow: q,
         ref: O,
-        int: q,
+        int: R,
         float: (e) => P(e).min(0).formType("float"),
-        createTime: R,
+        createTime: N,
         updateTime: I,
         image: L,
         images: J,
@@ -729,7 +762,7 @@
             throw new Error("modelName expected a string, but got a " + e);
           return {
             parent: O(e, "父分类"),
-            level: q("级别").computed(async (t) => {
+            level: R("级别").computed(async (t) => {
               if (!t.parent) return 0;
               const r = mongoose.models[e];
               if (!r)
@@ -924,7 +957,37 @@
       };
     },
     function (e, t, r) {
-      const n = new (r(3))({
+      "use strict";
+      e.exports = {
+        reg2str: function (e) {
+          if (!(e instanceof RegExp))
+            throw new Error(
+              "[reg2str ERROR] reg is expected a RegExp, but got a " + e
+            );
+          let t = e.source;
+          for (let e = 0, r = t.length; e < r; e++)
+            ("\\" !== t[e] && '"' !== t[e]) ||
+              ((t = t.substring(0, e) + "\\" + t.substring(e++)), (r += 2));
+          return t + "|" + e.flags;
+        },
+        str2reg: function (e) {
+          if ("string" != typeof e)
+            throw new Error(
+              "[str2reg ERROR] str is expected a String, but got a " + e
+            );
+          const t = e.lastIndexOf("|");
+          let r = null;
+          try {
+            r = JSON.parse('"' + e.substr(0, t) + '"');
+          } catch {
+            r = e.substr(0, t);
+          }
+          return new RegExp(r, e.substr(t + 1));
+        },
+      };
+    },
+    function (e, t, r) {
+      const n = new (r(4))({
         messages: {
           required: "必填项:{field}",
           string: "{field}字段必须为字符串",
@@ -1945,7 +2008,7 @@
             g
           );
         })();
-      }.call(this, r(4)));
+      }.call(this, r(5)));
     },
     function (e, t) {
       var r;
