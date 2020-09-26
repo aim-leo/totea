@@ -212,18 +212,6 @@ function str2class(c) {
   }
 }
 
-function reg2str(reg) {
-  return `_regexp_${reg.flags}|${reg.source}`;
-}
-
-function str2reg(value) {
-  if (typeof value === "string" && value.startsWith("_regexp_")) {
-    // this split isn't working correctly
-    const [, flags, source] = value.match(/_regexp_([^|]*)\|(.*)/) || [];
-    return new RegExp(source, flags);
-  }
-}
-
 module.exports = {
   whatType,
   isType,
@@ -254,7 +242,4 @@ module.exports = {
 
   class2str,
   str2class,
-
-  reg2str,
-  str2reg,
 };

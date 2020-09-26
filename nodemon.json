@@ -1,15 +1,13 @@
 {
   "restartable": "rs",
-  "ignore": [
-    ".git",
-    "node_modules",
-    "test/public"
-  ],
+  "ignore": [".git", "node_modules", "test/public"],
   "verbose": true,
   "watch": [
     "test/model",
     "test/service",
     "test/www",
+    "test/controller",
+    "test/module",
     "./*.js"
   ],
   "env": {

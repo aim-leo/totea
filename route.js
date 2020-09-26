@@ -1,73 +1,20 @@
 const importModules = require("import-modules");
 const path = require("path");
 const merge = require("deepmerge");
-const { stringify, parse } = require("telejson");
 
 const express = require("./express");
-const { isString, isObject, isFunc, isArray } = require("./helper");
+const { isString, isObject, isFunc, isArray, isNil } = require("./helper");
 
 const ToteaService = require("./service");
-const ToteaControoler = require("./controller");
+const ToteaController = require("./controller");
 const { parseRequestParams } = require("./middleware");
 const createUpload = require("./upload");
 
-function formatFileName(file) {
-  if (!isString(file)) {
-    throw new Error("file name expected a string type");
-  }
-  return file.split(".").slice(0, -1).join("-");
-}
-
-function readFileList(dir, reg) {
-  const fs = require("fs");
-  const path = require("path");
-
-  if (isNil(dir) || !isString(dir)) {
-    throw new Error("dir expecetd a string type");
-  }
-
-  if (isString(reg)) {
-    reg = new RegExp(`.${reg}$`);
-  }
-
-  if (!isUndef(reg) && !isReg(reg)) {
-    throw new Error("dir expecetd undefined or a reg type");
-  }
-
-  const fileList = fs.readdirSync(dir);
-
-  const result = [];
-
-  for (const file of fileList) {
-    const p = path.join(dir, file);
-    const stat = fs.statSync(p);
-
-    if (!stat.isFile()) {
-      continue;
-    }
-
-    if (reg && !reg.test(file)) {
-      continue;
-    }
-
-    result.push(file);
-  }
-
-  result.toObject = function () {
-    const r = {};
-    for (const f of result) {
-      const name = formatFileName(f);
-
-      if (!name) throw new Error("name is empty!");
-
-      r[name] = f;
-    }
-
-    return r;
-  };
-
-  return result;
-}
+const {
+  formatFileName,
+  readSingleFileList,
+  readDirList,
+} = require("./util/fs");
 
 class ToteaRoute {
   constructor({ src = ".", router, middleware = {}, interceptors = [] } = {}) {
@@ -102,6 +49,7 @@ class ToteaRoute {
     this._models = importModules(this._getPath(src, "model"));
 
     this._staticPath = this._getPath(src, "static");
+    this._modulePath = this._getPath(src, "module");
 
     this._mappingGuardAndShip();
   }
@@ -117,12 +65,57 @@ class ToteaRoute {
     }
   }
 
+  // support module define like
+  // -module
+  //   -user
+  //     -controller.js
+  //     -model.js
+  //     -service.js
+  injectFromModule() {
+    const inject = (moduleName, module) => {
+      // check
+      if (isNil(module.controller, module.model)) {
+        throw new Error(
+          `module expected atleast export a model or a controller`
+        );
+      }
+      // import module's controller service model into this._controllers
+      if (!isNil(module.model)) {
+        this._models[moduleName] = module.model;
+      }
+      if (!isNil(module.service)) {
+        this._services[moduleName] = module.service;
+      }
+      if (!isNil(module.controller)) {
+        this._controllers[moduleName] = module.controller;
+      }
+
+      // then create router
+      this._router.use("/" + moduleName, this.route(moduleName));
+    };
+    // inject single file module
+    const moduleFiles = readSingleFileList(this._modulePath);
+    for (const moduleName of moduleFiles) {
+      const module = require(this._getPath(this._modulePath, moduleName));
+
+      inject(formatFileName(moduleName), module);
+    }
+
+    const moduleDirs = readDirList(this._modulePath);
+    // read file form those dir
+    for (const dir of moduleDirs) {
+      const module = importModules(this._getPath(this._modulePath, dir));
+
+      inject(dir, module);
+    }
+  }
+
   // auto mapping static html file into route
   // ep: static/index.html => /, static/abc.html => /abc
   // it is not recommand
   injectStatic() {
     // inject page from static
-    const staticList = readFileList(this._staticPath).toObject();
+    const staticList = readSingleFileList(this._staticPath).toObject();
     for (const key in staticList) {
       this._router.get("/" + (key === "index" ? "" : key), (req, res, next) => {
         res.sendFile(staticList[key], { root: this._staticPath });
@@ -259,16 +252,56 @@ class ToteaRoute {
   _importController(routeName) {
     // import model
     const model = this._models[routeName];
-    const service = this._services[routeName] || new ToteaService(model);
 
-    const controller =
-      this._controllers[routeName] || new ToteaControoler(service);
+    const service = this._getService({
+      service: this._services[routeName],
+      model,
+    });
+
+    const controller = this._getController({
+      controller: this._controllers[routeName],
+      service,
+      model,
+    });
 
     return controller;
   }
 
-  _getPath(src, dir) {
-    return path.join(src, dir);
+  _getPath(src, ...dir) {
+    return path.join(src, ...dir);
+  }
+
+  _getService({ service, model }) {
+    if (isObject(service)) {
+      return service;
+    }
+
+    if (!model) {
+      throw new Error("init service expected a model");
+    }
+
+    service = service || ToteaService;
+
+    return new service(model);
+  }
+
+  _getController({ controller, service, model }) {
+    if (isObject(controller)) {
+      return controller;
+    }
+
+    service = this._getService({
+      service,
+      model,
+    });
+
+    if (!service) {
+      throw new Error("init controller expected a service");
+    }
+
+    controller = controller || ToteaController;
+
+    return new controller(service);
   }
 }
 
