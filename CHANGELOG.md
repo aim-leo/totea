@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.15.0](https://github.com/aim-leo/totea/compare/v1.14.0...v1.15.0) (2020-09-26)
+
+### Features
+
+- 🎸 complete of add module ([b8e0214](https://github.com/aim-leo/totea/commit/b8e0214ab4279e1d1ec76ba0f7418133eeb0afbc))
+- 🎸 tmp add module ([9ca49c5](https://github.com/aim-leo/totea/commit/9ca49c55fb1c4b96c764efd901b1680de4e8d67c))
+
 ## [1.14.0](https://github.com/aim-leo/totea/compare/v1.13.0...v1.14.0) (2020-08-30)
 
 ### Features
