@@ -13,11 +13,11 @@ const {
   defineEnumerablePropertry,
   class2str,
   str2class,
-} = require("./helper");
+} = require("./util/helper");
 
-const { reg2str, str2reg } = require("./reg2str");
+const { reg2str, str2reg } = require("./util/reg2str");
 
-const { validator, getValidatorMessage } = require("./validator");
+const { validator, getValidatorMessage } = require("./util/validator");
 
 class Totea {
   constructor() {

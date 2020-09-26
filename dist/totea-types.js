@@ -945,15 +945,6 @@
               return Array;
           }
         },
-        reg2str: function (e) {
-          return `_regexp_${e.flags}|${e.source}`;
-        },
-        str2reg: function (e) {
-          if ("string" == typeof e && e.startsWith("_regexp_")) {
-            const [, t, r] = e.match(/_regexp_([^|]*)\|(.*)/) || [];
-            return new RegExp(r, t);
-          }
-        },
       };
     },
     function (e, t, r) {

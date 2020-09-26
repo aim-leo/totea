@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
 
-const { isString, isFunc, isArray } = require("./helper");
-const connect = require("./db");
+const { isString, isFunc, isArray } = require("./util/helper");
+const connect = require("./util/db");
 const types = require("./types");
-const { toMongooseSchema } = require("./schema");
+const { toMongooseSchema } = require("./util/schema");
 
 const ToteaGroup = types.ToteaGroup;
 

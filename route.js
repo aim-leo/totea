@@ -3,7 +3,7 @@ const path = require("path");
 const merge = require("deepmerge");
 
 const express = require("./express");
-const { isString, isObject, isFunc, isArray, isNil } = require("./helper");
+const { isString, isObject, isFunc, isArray, isNil } = require("./util/helper");
 
 const ToteaService = require("./service");
 const ToteaController = require("./controller");
@@ -54,14 +54,14 @@ class ToteaRoute {
     this._mappingGuardAndShip();
   }
 
-  route(routeName, { middleware = {} } = {}) {
+  createRoute(routeName, { middleware = {} } = {}) {
     return this._formatRoute(routeName, merge(this._middleware, middleware));
   }
 
-  injectModel() {
+  injectRouteFromModel() {
     // inject route from model
     for (const key in this._models) {
-      this._router.use("/" + key, this.route(key));
+      this._router.use("/" + key, this.createRoute(key));
     }
   }
 
@@ -71,7 +71,7 @@ class ToteaRoute {
   //     -controller.js
   //     -model.js
   //     -service.js
-  injectFromModule() {
+  injectRouteFromModule() {
     const inject = (moduleName, module) => {
       // check
       if (isNil(module.controller, module.model)) {
@@ -91,7 +91,7 @@ class ToteaRoute {
       }
 
       // then create router
-      this._router.use("/" + moduleName, this.route(moduleName));
+      this._router.use("/" + moduleName, this.createRoute(moduleName));
     };
     // inject single file module
     const moduleFiles = readSingleFileList(this._modulePath);

@@ -3,7 +3,7 @@ const types = require("../types");
 
 const ToteaService = require("../service");
 
-const { isString, isNil } = require("../helper");
+const { isString, isNil } = require("../util/helper");
 
 const ToteaGroup = types.ToteaGroup;
 
