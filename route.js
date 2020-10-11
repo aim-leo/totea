@@ -2,12 +2,11 @@ const importModules = require("import-modules");
 const path = require("path");
 const merge = require("deepmerge");
 
-const express = require("./express");
+const ToteaRouter = require("./util/router");
 const { isString, isObject, isFunc, isArray, isNil } = require("./util/helper");
 
 const ToteaService = require("./service");
 const ToteaController = require("./controller");
-const { parseRequestParams } = require("./middleware");
 const createUpload = require("./upload");
 
 const {
@@ -50,8 +49,6 @@ class ToteaRoute {
 
     this._staticPath = this._getPath(src, "static");
     this._modulePath = this._getPath(src, "module");
-
-    this._mappingGuardAndShip();
   }
 
   createRoute(routeName, { middleware = {} } = {}) {
@@ -149,18 +146,6 @@ class ToteaRoute {
     }
   }
 
-  _mappingGuardAndShip() {
-    // apply interceptors
-    for (const g of this._interceptors) {
-      if (!isFunc(g)) {
-        throw new Error(
-          `interceptors expected a array<function> or a function`
-        );
-      }
-      this._router.use(g);
-    }
-  }
-
   _formatRoute(routeName, middleware = {}) {
     if (!isString(routeName)) {
       throw new Error(`routeName expected a string, but get a ${routeName}`);
@@ -177,56 +162,11 @@ class ToteaRoute {
 
     const controller = this._importController(routeName);
 
-    const router = express.Router();
-
-    function mappingMiddleware(type) {
-      const m = middleware[type] || [];
-      if (isFunc(m)) {
-        return [m];
-      } else if (isArray(m)) {
-        return m;
-      }
-
-      throw new Error(
-        `middleware[${type}] expected a array<function> or a function`
-      );
-    }
-
-    router
-      .route("/")
-      .get(
-        parseRequestParams,
-        ...mappingMiddleware("query"),
-        async (req, res, next) => {
-          controller.jsonWrite(next, res, await controller.query(req.query));
-        }
-      )
-      .post(...mappingMiddleware("insert"), async (req, res, next) => {
-        controller.jsonWrite(next, res, await controller.insert(req.body));
-      });
-    router
-      .route("/:id")
-      .get(...mappingMiddleware("queryById"), async (req, res, next) => {
-        controller.jsonWrite(
-          next,
-          res,
-          await controller.queryById(req.params.id)
-        );
-      })
-      .delete(...mappingMiddleware("deleteById"), async (req, res, next) => {
-        controller.jsonWrite(
-          next,
-          res,
-          await controller.deleteById(req.params.id)
-        );
-      })
-      .patch(...mappingMiddleware("updateById"), async (req, res, next) => {
-        controller.jsonWrite(
-          next,
-          res,
-          await controller.updateById(req.params.id, req.body)
-        );
-      });
+    const router = new ToteaRouter({
+      controller,
+      middleware,
+      interceptor: this._interceptors,
+    });
 
     // mapping form create page
     const toteaGroup = this._models[routeName].toteaGroup;
@@ -239,11 +179,6 @@ class ToteaRoute {
         ),
         action: routeName,
       });
-    });
-
-    // at last, write json
-    router.use((req, res, next) => {
-      controller.jsonRes(res, res.preRes);
     });
 
     return router;

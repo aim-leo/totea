@@ -74,6 +74,10 @@ function isFunc(...objs) {
   return objs.every((obj) => inType(obj, [() => {}, async () => {}]));
 }
 
+function isFuncList(obj) {
+  return isArray(obj) && obj.every((s) => isFunc(s));
+}
+
 function isImagePath(...objs) {
   return objs.every((obj) =>
     /\.(png|jpg|gif|jpeg|webp|bmp|psd|tiff|tga|eps)$/.test(obj)
@@ -234,6 +238,7 @@ module.exports = {
   isPromise,
   isReg,
   isImagePath,
+  isFuncList,
 
   removeEmpty,
   randomString,
