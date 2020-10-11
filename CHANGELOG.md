@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.16.0](https://github.com/aim-leo/totea/compare/v1.15.1...v1.16.0) (2020-10-11)
+
+### Features
+
+- 🎸 dispatch router from route ([f585273](https://github.com/aim-leo/totea/commit/f5852731369a5fef0c65063322af4dd1400faac0))
+
 ### [1.15.1](https://github.com/aim-leo/totea/compare/v1.15.0...v1.15.1) (2020-10-11)
 
 ## [1.15.0](https://github.com/aim-leo/totea/compare/v1.14.0...v1.15.0) (2020-09-26)
