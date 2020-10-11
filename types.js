@@ -9,6 +9,9 @@ const {
   isBoolean,
   isObject,
   isArray,
+} = require("tegund");
+
+const {
   removeEmpty,
   defineEnumerablePropertry,
   class2str,

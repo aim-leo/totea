@@ -3,15 +3,10 @@ const path = require("path");
 const multer = require("multer");
 const md5 = require("md5");
 const resizer = require("resize-img");
+const { isString, isFunc, isUndef } = require("tegund");
 
 const express = require("./express");
-const {
-  isString,
-  isFunc,
-  isUndef,
-  isImagePath,
-  randomString,
-} = require("./util/helper");
+const { isImagePath, randomString } = require("./util/helper");
 
 const tmpDir = path.join(global.ROOT, "./public/tmp");
 

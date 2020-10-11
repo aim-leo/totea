@@ -5,8 +5,9 @@
  * @Last Modified time: 2019-07-29 13:56:40
  */
 
+const { isString } = require("tegund");
+
 const { validator } = require("./util/validator");
-const { isString } = require("./util/helper");
 
 const Util = require("./util");
 

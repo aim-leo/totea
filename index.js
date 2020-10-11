@@ -1,12 +1,11 @@
 const http = require("http");
 const path = require("path");
-
 const createError = require("http-errors");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
+const { isNumber, acceptString, acceptNumber } = require("tegund");
 
 const express = require("./express");
-const { isNumber, isString } = require("./util/helper");
 
 class ToteaServer {
   constructor({ mongoUri, port = 3000 } = {}) {
@@ -21,9 +20,7 @@ class ToteaServer {
     const server = http.createServer(app);
 
     // check port
-    if (!isNumber(port)) {
-      throw new Error(`port expected a number, but get a ${port}`);
-    }
+    acceptNumber(port, `port expected a number, but get a ${port}`);
 
     /**
      * Event listener for HTTP server "error" event.
@@ -150,9 +147,8 @@ class ToteaServer {
   customizeToteaRouter() {}
 
   setMongoUri(uri) {
-    if (!isString(uri)) {
-      throw new Error("uri expected a string type");
-    }
+    acceptString(uri, "uri expected a string type");
+
     const Model = require("./model");
 
     Model.mongoUri = uri;

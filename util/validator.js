@@ -73,28 +73,7 @@ const validator = new FastestValidator({
     uuidVersion: "{field}字段必须是提供的有效UUID版本",
 
     classInstanceOf: "{field}字段必须是{expected}类的实例",
-
-    mongoObjectId: "'{field}' 必须是一个正确的ObjectId, 实际: {actual}",
   },
-});
-
-// Register a custom 'even' validator
-validator.add("objectId", function ({ schema, messages }, path, context) {
-  return {
-    source: `
-    const mongoose = require('mongoose')
-    const Schema = mongoose.Schema
-    const ObjectId = Schema.Types.ObjectId
-if (!(value instanceof ObjectId))
-  ${this.makeError({
-    type: "mongoObjectId",
-    actual: "value",
-    messages,
-  })}
-
-return value;
-    `,
-  };
 });
 
 function getValidatorMessage(type, field = "", expected, actual) {
@@ -110,8 +89,6 @@ function getValidatorMessage(type, field = "", expected, actual) {
 
   return message;
 }
-
-// console.log(validator.messages)
 
 module.exports = {
   validator,

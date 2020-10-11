@@ -60,9 +60,243 @@
         return Object.prototype.hasOwnProperty.call(e, t);
       }),
       (r.p = ""),
-      r((r.s = 0))
+      r((r.s = 1))
     );
   })([
+    function (e, t, r) {
+      e.exports = (function (e) {
+        var t = {};
+        function r(n) {
+          if (t[n]) return t[n].exports;
+          var i = (t[n] = { i: n, l: !1, exports: {} });
+          return e[n].call(i.exports, i, i.exports, r), (i.l = !0), i.exports;
+        }
+        return (
+          (r.m = e),
+          (r.c = t),
+          (r.d = function (e, t, n) {
+            r.o(e, t) ||
+              Object.defineProperty(e, t, { enumerable: !0, get: n });
+          }),
+          (r.r = function (e) {
+            "undefined" != typeof Symbol &&
+              Symbol.toStringTag &&
+              Object.defineProperty(e, Symbol.toStringTag, { value: "Module" }),
+              Object.defineProperty(e, "__esModule", { value: !0 });
+          }),
+          (r.t = function (e, t) {
+            if ((1 & t && (e = r(e)), 8 & t)) return e;
+            if (4 & t && "object" == typeof e && e && e.__esModule) return e;
+            var n = Object.create(null);
+            if (
+              (r.r(n),
+              Object.defineProperty(n, "default", { enumerable: !0, value: e }),
+              2 & t && "string" != typeof e)
+            )
+              for (var i in e)
+                r.d(
+                  n,
+                  i,
+                  function (t) {
+                    return e[t];
+                  }.bind(null, i)
+                );
+            return n;
+          }),
+          (r.n = function (e) {
+            var t =
+              e && e.__esModule
+                ? function () {
+                    return e.default;
+                  }
+                : function () {
+                    return e;
+                  };
+            return r.d(t, "a", t), t;
+          }),
+          (r.o = function (e, t) {
+            return Object.prototype.hasOwnProperty.call(e, t);
+          }),
+          (r.p = ""),
+          r((r.s = 1))
+        );
+      })([
+        function (e, t) {
+          function r(e) {
+            return Object.prototype.toString.call(e);
+          }
+          function n(...e) {
+            return !(e.length < 2) && e.every((t) => r(t) === r(e[0]));
+          }
+          function i(e, t) {
+            if (!n(t, [])) throw new Error("list expect a " + r([]));
+            let i = !1;
+            for (const r in t)
+              if (n(t[r], e)) {
+                i = !0;
+                break;
+              }
+            return i;
+          }
+          function a(...e) {
+            return e.every((e) => Number.isNaN(e));
+          }
+          e.exports = {
+            whatType: r,
+            isType: n,
+            inType: i,
+            isArray: function (...e) {
+              return n(...e, []);
+            },
+            isBoolean: function (...e) {
+              return n(...e, !0);
+            },
+            isFunc: function (...e) {
+              return e.every((e) => i(e, [() => {}, async () => {}]));
+            },
+            isFunction: function (...e) {
+              return e.every((e) => n(e, () => {}));
+            },
+            isAsyncFunction: function (...e) {
+              return e.every((e) => n(e, async () => {}));
+            },
+            isNaN: a,
+            isNil: function (...e) {
+              return e.every((e) => i(e, [void 0, null]));
+            },
+            isNumber: function (...e) {
+              return n(...e, 1) && !a(...e);
+            },
+            isString: function (...e) {
+              return n(...e, "");
+            },
+            isSymbol: function (...e) {
+              return n(...e, Symbol("Symbol"));
+            },
+            isUndef: function (...e) {
+              return n(...e, void 0);
+            },
+            isObject: function (...e) {
+              return n(...e, {});
+            },
+            isOb: function (...e) {
+              return e.every((e) => i(e, [{}, []]));
+            },
+            isNull: function (...e) {
+              return n(...e, null);
+            },
+            isPromise: function (...e) {
+              return n(...e, Promise.resolve());
+            },
+            isReg: function (...e) {
+              return n(...e, /d/);
+            },
+            isDate: function (...e) {
+              return e.every((e) => n(e, new Date()));
+            },
+            types: [
+              "Object",
+              "Array",
+              "Ob",
+              "Boolean",
+              "String",
+              "Number",
+              "Symbol",
+              "Promise",
+              "NaN",
+              "Nil",
+              "Undef",
+              "Reg",
+              "Function",
+              "AsyncFunction",
+              "Func",
+              "Date",
+            ],
+          };
+        },
+        function (e, t, r) {
+          const n = r(0),
+            i = r(2),
+            a = r(3),
+            o = r(4);
+          e.exports = { ...n, ...i, ...a, ...o };
+        },
+        function (e, t, r) {
+          const n = r(0),
+            { isFunction: i, isArray: a, types: o } = n;
+          function s(e, t) {
+            if (!i(t)) throw new Error("typedFunction expected a function");
+            return !!a(e) && t(...e);
+          }
+          const u = {};
+          for (const e of o) {
+            const t = n["is" + e];
+            u[`is${e}Array`] = (e) => s(e, t);
+          }
+          e.exports = { isTypedArray: s, ...u };
+        },
+        function (e, t, r) {
+          const n = r(0),
+            { whatType: i, isFunction: a, isArray: o, types: s } = n;
+          function u(e, t, r) {
+            if (!a(t)) throw new Error("typedFunction expected a function");
+            if (!t(e))
+              throw new Error(
+                r ||
+                  `obj expected a ${t.name.replace(
+                    "is",
+                    ""
+                  )} type, but got a ${i(e)}`
+              );
+          }
+          function l(e, t, r) {
+            u(e, o, "acceptArray objs expected a array, but got a " + i(e));
+            for (const n in e)
+              u(e[n], t, `acceptArray[${n}] fault, message: ${r}`);
+          }
+          function c(e, t, r) {
+            if (!a(t)) throw new Error("typedFunction expected a function");
+            if (t(e))
+              throw new Error(
+                r || `obj can not be a ${t.name.replace("is", "")} type!`
+              );
+          }
+          function f(e, t, r) {
+            u(e, o, "refuseArray objs expected a array, but got a " + i(e));
+            for (const n in e) c(e[n], t, `refuses[${n}] fault, message: ${r}`);
+          }
+          const h = {};
+          for (const e of s) {
+            const t = n["is" + e];
+            (h["accept" + e] = (e, r) => u(e, t, r)),
+              (h[`accept${e}Array`] = (e, r) => l(e, t, r)),
+              (h["refuse" + e] = (e, r) => c(e, t, r)),
+              (h[`refuse${e}Array`] = (e, r) => f(e, t, r));
+          }
+          e.exports = {
+            accept: u,
+            acceptArray: l,
+            refuse: c,
+            refuseArray: f,
+            ...h,
+          };
+        },
+        function (e, t, r) {
+          const { isString: n, isArray: i, isObject: a } = r(0);
+          e.exports = {
+            isEmptyString: function (...e) {
+              return n(...e) && e.every((e) => "" === e);
+            },
+            isEmptyArray: function (...e) {
+              return i(...e) && e.every((e) => 0 === e.length);
+            },
+            isEmptyObject: function (...e) {
+              return a(...e) && e.every((e) => 0 === Object.keys(e).length);
+            },
+          };
+        },
+      ]);
+    },
     function (e, t, r) {
       const {
           isNumber: n,
@@ -73,15 +307,17 @@
           isFunction: u,
           isAsyncFunction: l,
           isBoolean: c,
-          isObject: h,
-          isArray: f,
+          isObject: f,
+          isArray: h,
+        } = r(0),
+        {
           removeEmpty: d,
           defineEnumerablePropertry: p,
           class2str: m,
           str2class: y,
-        } = r(1),
-        { reg2str: g, str2reg: b } = r(2),
-        { validator: _, getValidatorMessage: v } = r(3);
+        } = r(2),
+        { reg2str: g, str2reg: b } = r(3),
+        { validator: _, getValidatorMessage: v } = r(4);
       class x {
         constructor() {
           (this._type = null),
@@ -154,7 +390,7 @@
             this.type("array"),
             (this._childType = y(e)),
             t &&
-              f(t) &&
+              h(t) &&
               this.validate(
                 (e) => e.every((e) => t.includes(e)),
                 r || `${this._name}数组的每个值都必须在${t}范围中`
@@ -212,7 +448,7 @@
         refFilter(e, t) {
           let r = e;
           if (o(e)) r = () => ({ _id: e });
-          else if (h(e)) r = () => e;
+          else if (f(e)) r = () => e;
           else if (!s(e))
             throw new Error(
               "ref filter is expect a string id | object | function"
@@ -362,7 +598,7 @@
           );
         }
         toProtoJson(e = []) {
-          if (!f(e)) throw new Error("excludeList expected a array");
+          if (!h(e)) throw new Error("excludeList expected a array");
           const t = {};
           for (const r of Object.keys(this)) {
             const n = this[r];
@@ -469,7 +705,7 @@
           return e;
         }
         toProtoJson(e = []) {
-          if (!f(e)) throw new Error("excludeList expected a array");
+          if (!h(e)) throw new Error("excludeList expected a array");
           const t = {};
           for (const r in this.tree) {
             const n = this.tree[r];
@@ -478,7 +714,7 @@
           return { tree: t };
         }
         fromProtoJson({ tree: e }) {
-          if (!e || !h(e))
+          if (!e || !f(e))
             throw new Error(
               "[fromProtoJson] expected a json like { tree: {} }"
             );
@@ -546,7 +782,7 @@
         }
         async _validate(e, t) {
           try {
-            if (!h(e)) return "params expected a object";
+            if (!f(e)) return "params expected a object";
             const r = "create" === t ? this.createJson : this.updateJson,
               n = _.validate(e, r);
             if (n && n.length > 0) return n[0].message;
@@ -667,7 +903,7 @@
             )
             .name(e)
             .formType("input"),
-        C = (e = "密码") =>
+        P = (e = "密码") =>
           new x()
             .string()
             .parttern(
@@ -677,27 +913,27 @@
             .cate("pwd")
             .name(e)
             .formType("input"),
-        P = (e) => new x().number().name(e),
-        R = (e) => P(e).min(0).formType("int"),
-        q = (e) => new x().date().cate("date").default(Date.now).name(e),
-        N = (e = "创建时间") => q(e),
-        I = (e = "创建时间") => q(e).cate("updateTime"),
-        $ = (e, t) =>
+        C = (e) => new x().number().name(e),
+        N = (e) => C(e).min(0).formType("int"),
+        R = (e) => new x().date().cate("date").default(Date.now).name(e),
+        q = (e = "创建时间") => R(e),
+        $ = (e = "创建时间") => R(e).cate("updateTime"),
+        U = (e, t) =>
           new x().array(e).name(t).cate("array").formType("dynamic_tags"),
-        U = (e, t, r) =>
-          $({ type: String, ref: e }, null)
+        I = (e, t, r) =>
+          U({ type: String, ref: e }, null)
             .ref(e)
             .cate("id")
             .name(t)
             .formType("multi_select"),
-        J = (e) => $(String, e).cate("image").formType("upload"),
+        J = (e) => U(String, e).cate("image").formType("upload"),
         L = (e) => J(e).length(1),
         D = {
           name: j("名称").required(),
           remark: A("备注"),
           logo: L("图片"),
-          createTime: N(),
-          updateTime: I(),
+          createTime: q(),
+          updateTime: $(),
         },
         V = {
           province: j("省").required(),
@@ -707,7 +943,7 @@
         },
         z = {
           phone: F().required().unique(),
-          pwd: C().required().exclude(),
+          pwd: P().required().exclude(),
           email: M(),
         };
       e.exports = {
@@ -727,7 +963,7 @@
             .name(e)
             .formType("input"),
         id: k,
-        pwd: C,
+        pwd: P,
         strongPwd: (e = "密码") =>
           new x()
             .string()
@@ -741,19 +977,19 @@
         email: M,
         phone: F,
         date: (e) => new x().date().cate("date").name(e).formType("date"),
-        dateNow: q,
+        dateNow: R,
         ref: O,
-        int: R,
-        float: (e) => P(e).min(0).formType("float"),
-        createTime: N,
-        updateTime: I,
+        int: N,
+        float: (e) => C(e).min(0).formType("float"),
+        createTime: q,
+        updateTime: $,
         image: L,
         images: J,
         enums: (e, t) =>
           new x().name(t).enum(e).cate("enums").formType("radio"),
         boolean: (e) => new x().boolean().name(e).formType("switch"),
-        array: $,
-        ids: U,
+        array: U,
+        ids: I,
         baseMixin: D,
         addressMixin: V,
         accountMixin: z,
@@ -762,7 +998,7 @@
             throw new Error("modelName expected a string, but got a " + e);
           return {
             parent: O(e, "父分类"),
-            level: R("级别").computed(async (t) => {
+            level: N("级别").computed(async (t) => {
               if (!t.parent) return 0;
               const r = mongoose.models[e];
               if (!r)
@@ -776,116 +1012,46 @@
                 );
               return (n.level || 0) + 1;
             }),
-            children: U(e, "子分类").forbid(),
+            children: I(e, "子分类").forbid(),
           };
         },
       };
     },
-    function (e, t) {
-      function r(e) {
-        return Object.prototype.toString.call(e);
-      }
-      function n(...e) {
-        return 0 === e.map((t) => r(t) === r(e[0])).filter((e) => !e).length;
-      }
-      function i(...e) {
-        return n(...e, {});
-      }
-      function a(...e) {
-        return n(...e, []);
-      }
-      function o(...e) {
-        return n(...e, "");
-      }
-      function s(...e) {
-        return e.every((e) => Number.isNaN(e));
-      }
-      function u(...e) {
-        return n(...e, null);
-      }
-      function l(...e) {
-        return n(...e, void 0);
-      }
-      function c(...e) {
-        return e.every((e) => h(e, [() => {}, async () => {}]));
-      }
-      function h(e, t) {
-        if (!n(t, [])) throw new Error("list expect a " + r([]));
-        let i = !1;
-        for (const r in t)
-          if (n(t[r], e)) {
-            i = !0;
-            break;
-          }
-        return i;
-      }
-      e.exports = {
-        whatType: r,
-        isType: n,
-        inType: h,
-        isArray: a,
-        isBoolean: function (...e) {
-          return n(...e, !0);
-        },
-        isFunc: c,
-        isFunction: function (...e) {
-          return e.every((e) => n(e, () => {}));
-        },
-        isAsyncFunction: function (...e) {
-          return e.every((e) => n(e, async () => {}));
-        },
-        isNaN: s,
-        isNil: function (...e) {
-          return e.every((e) => h(e, [void 0, null]));
-        },
-        isNumber: function (...e) {
-          return n(...e, 1) && !s(...e);
-        },
+    function (e, t, r) {
+      const {
+        isArray: n,
+        isFunc: i,
+        isNaN: a,
         isString: o,
-        isSymbol: function (...e) {
-          return n(...e, Symbol("Symbol"));
-        },
-        isUndef: l,
-        isObject: i,
-        isOb: function (...e) {
-          return e.every((e) => h(e, [{}, []]));
-        },
-        isNull: u,
-        isPromise: function (...e) {
-          return n(...e, Promise.resolve());
-        },
-        isReg: function (...e) {
-          return n(...e, /d/);
-        },
-        isImagePath: function (...e) {
-          return e.every((e) =>
-            /\.(png|jpg|gif|jpeg|webp|bmp|psd|tiff|tga|eps)$/.test(e)
-          );
-        },
+        isUndef: s,
+        isObject: u,
+        isNull: l,
+      } = r(0);
+      e.exports = {
         removeEmpty: function (
           e,
           {
             removeUndefined: t = !0,
             removeNull: r = !0,
-            removeNaN: n = !0,
+            removeNaN: i = !0,
             removeEmptyString: o = !0,
             removeEmptyArray: c = !0,
-            removeFalse: h = !0,
+            removeFalse: f = !0,
           } = {}
         ) {
-          if (!i(e)) throw new Error("expected a object");
-          const f = {};
-          for (const i in e) {
-            const d = e[i];
-            (t && l(d)) ||
-              (r && u(d)) ||
-              (n && s(d)) ||
+          if (!u(e)) throw new Error("expected a object");
+          const h = {};
+          for (const u in e) {
+            const d = e[u];
+            (t && s(d)) ||
+              (r && l(d)) ||
+              (i && a(d)) ||
               (o && "" === d) ||
-              (c && a(d) && 0 === d.length) ||
-              (h && !1 === d) ||
-              (f[i] = d);
+              (c && n(d) && 0 === d.length) ||
+              (f && !1 === d) ||
+              (h[u] = d);
           }
-          return f;
+          return h;
         },
         randomString: function (e = 8) {
           let t = "";
@@ -908,7 +1074,7 @@
           });
         },
         class2str: function e(t) {
-          if (i(t) && t.hasOwnProperty("type")) return e(t.type);
+          if (u(t) && t.hasOwnProperty("type")) return e(t.type);
           if (o(t)) return t;
           switch (t) {
             case String:
@@ -928,8 +1094,8 @@
           }
         },
         str2class: function e(t) {
-          if (i(t) && t.hasOwnProperty("type")) return e(t.type);
-          if (c(t)) return t;
+          if (u(t) && t.hasOwnProperty("type")) return e(t.type);
+          if (i(t)) return t;
           switch (t) {
             case "string":
               return String;
@@ -978,7 +1144,7 @@
       };
     },
     function (e, t, r) {
-      const n = new (r(4))({
+      const n = new (r(5))({
         messages: {
           required: "必填项:{field}",
           string: "{field}字段必须为字符串",
@@ -1035,29 +1201,21 @@
           uuid: "{field}字段必须是有效的UUID",
           uuidVersion: "{field}字段必须是提供的有效UUID版本",
           classInstanceOf: "{field}字段必须是{expected}类的实例",
-          mongoObjectId: "'{field}' 必须是一个正确的ObjectId, 实际: {actual}",
         },
       });
-      n.add("objectId", function ({ schema: e, messages: t }, r, n) {
-        return {
-          source: `\n    const mongoose = require('mongoose')\n    const Schema = mongoose.Schema\n    const ObjectId = Schema.Types.ObjectId\nif (!(value instanceof ObjectId))\n  ${this.makeError(
-            { type: "mongoObjectId", actual: "value", messages: t }
-          )}\n\nreturn value;\n    `,
-        };
-      }),
-        (e.exports = {
-          validator: n,
-          getValidatorMessage: function (e, t = "", r, i) {
-            let a = n.messages[e];
-            if (!a) throw new Error("without this type: " + e);
-            return (
-              (a = a.replace("{field}", t)),
-              void 0 !== r && (a = a.replace("{expected}", r)),
-              void 0 !== i && (a = a.replace("{actual}", i)),
-              a
-            );
-          },
-        });
+      e.exports = {
+        validator: n,
+        getValidatorMessage: function (e, t = "", r, i) {
+          let a = n.messages[e];
+          if (!a) throw new Error("without this type: " + e);
+          return (
+            (a = a.replace("{field}", t)),
+            void 0 !== r && (a = a.replace("{expected}", r)),
+            void 0 !== i && (a = a.replace("{actual}", i)),
+            a
+          );
+        },
+      };
     },
     function (e, t, r) {
       "use strict";
@@ -1592,14 +1750,14 @@
               : !!("precise" == t.mode ? v : x).test(e) ||
                   this.makeError("email");
           }
-          function h(e, t) {
+          function f(e, t) {
             return (
               !0 !== t.convert || e instanceof Date || (e = new Date(e)),
               (e instanceof Date && !isNaN(e.getTime())) ||
                 this.makeError("date")
             );
           }
-          function f(e, t) {
+          function h(e, t) {
             return t.check.call(this, e, t);
           }
           function d(e, t) {
@@ -1666,8 +1824,8 @@
                 any: m,
                 array: p,
                 boolean: d,
-                custom: f,
-                date: h,
+                custom: h,
+                date: f,
                 email: c,
                 enum: l,
                 forbidden: u,
@@ -1999,7 +2157,7 @@
             g
           );
         })();
-      }.call(this, r(5)));
+      }.call(this, r(6)));
     },
     function (e, t) {
       var r;

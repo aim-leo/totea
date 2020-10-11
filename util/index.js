@@ -1,4 +1,6 @@
-const { removeEmpty, isObject } = require("./helper");
+const { isObject } = require("tegund");
+
+const { removeEmpty } = require("./helper");
 
 class Util {
   get isDev() {

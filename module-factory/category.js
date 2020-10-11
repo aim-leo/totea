@@ -1,9 +1,9 @@
+const { isString, isNil } = require("tegund");
+
 const Model = require("../model");
 const types = require("../types");
 
 const ToteaService = require("../service");
-
-const { isString, isNil } = require("../util/helper");
 
 const ToteaGroup = types.ToteaGroup;
 

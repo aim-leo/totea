@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
+const { acceptString, acceptArray, isFunc } = require("tegund");
 
-const { isString, isFunc, isArray } = require("./util/helper");
 const connect = require("./util/db");
 const types = require("./types");
 const { toMongooseSchema } = require("./util/schema");
@@ -72,9 +72,10 @@ class ToteaModel {
   }
 
   _beforeInit(modelName, toteaGroup) {
-    if (!isString(modelName)) {
-      throw new Error(`modelName expected a string, but get a ${modelName}`);
-    }
+    acceptString(
+      modelName,
+      `modelName expected a string, but get a ${modelName}`
+    );
 
     if (!(toteaGroup instanceof ToteaGroup)) {
       throw new Error(
@@ -156,18 +157,16 @@ class ToteaModel {
     for (const key in refConfig) {
       if (!doc[key]) continue;
 
-      const { ref, refFilter = {}, isArray: _isArray } = refConfig[key];
+      const { ref, refFilter = {}, isArray } = refConfig[key];
       const model = mongoose.models[ref];
 
       if (!model) throw new Error(`新增失败， ${ref}表不存在`);
 
       const { filter, msg } = refFilter;
 
-      const ids = _isArray ? doc[key] : [doc[key]];
+      const ids = isArray ? doc[key] : [doc[key]];
 
-      if (!isArray(ids)) {
-        throw new Error("_checkRef error, expected a id list");
-      }
+      acceptArray(ids, "_checkRef error, expected a id list");
 
       for (const _id of ids) {
         let filterVal = {

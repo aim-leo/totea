@@ -1,7 +1,7 @@
 const path = require("path");
 const fs = require("fs");
 
-const { isString, isNil, isUndef, isFunc, isArray } = require("./helper");
+const { isString, isNil, isFunc, isArray } = require("tegund");
 
 function formatFileName(file) {
   if (!isString(file)) {

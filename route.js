@@ -1,9 +1,9 @@
 const importModules = require("import-modules");
 const path = require("path");
 const merge = require("deepmerge");
+const { isString, isObject, isFunc, isArray, isNil } = require("tegund");
 
 const ToteaRouter = require("./util/router");
-const { isString, isObject, isFunc, isArray, isNil } = require("./util/helper");
 
 const ToteaService = require("./service");
 const ToteaController = require("./controller");

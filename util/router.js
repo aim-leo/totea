@@ -1,24 +1,28 @@
 const express = require("express");
 
-const { isObject, isFunc, isFuncList } = require("./helper");
+const {
+  acceptObject,
+  acceptFuncArray,
+  isFunc,
+  isFuncArray,
+} = require("tegund");
 
 const { parseRequestParams } = require("../middleware");
 
 class ToteaRouter {
   constructor({ controller, middleware, interceptor }) {
-    if (!isObject(controller)) {
-      throw new Error(`controller expected a object, but get a ${controller}`);
-    }
-
-    if (!isObject(middleware)) {
-      throw new Error(`middleware expected a object, but get a ${middleware}`);
-    }
-
-    if (!isFuncList(interceptor)) {
-      throw new Error(
-        `interceptor expected a array | function, but get a ${interceptor}`
-      );
-    }
+    acceptObject(
+      controller,
+      `controller expected a object, but get a ${controller}`
+    );
+    acceptObject(
+      middleware,
+      `middleware expected a object, but get a ${middleware}`
+    );
+    acceptFuncArray(
+      interceptor,
+      `interceptor expected a function array, but get a ${interceptor}`
+    );
 
     // insert a to json response interceptor
     interceptor.push((req, res, next) => {
@@ -121,7 +125,7 @@ class ToteaRouter {
     const m = this.middleware[type] || [];
     if (isFunc(m)) {
       return [m];
-    } else if (isFuncList(m)) {
+    } else if (isFuncArray(m)) {
       return m;
     }
 
