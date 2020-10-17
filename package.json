@@ -30,11 +30,10 @@
     "release:d": "standard-version --dry-run",
     "push": "git push --follow-tags origin master && git push --follow-tags github master",
     "pub2npm": "nrm use npm && npm publish",
-    "test": "nodemon test/www",
+    "test": "nodemon --exec babel-node test/www",
     "build": "node_modules/webpack/bin/webpack.js --config build/webpack.config.js --mode production"
   },
   "dependencies": {
-    "@babel/plugin-proposal-class-properties": "^7.10.4",
     "cookie-parser": "~1.4.3",
     "cors": "^2.8.5",
     "deepmerge": "^4.2.2",
@@ -56,6 +55,8 @@
   "devDependencies": {
     "@babel/core": "^7.5.5",
     "@babel/node": "^7.5.5",
+    "@babel/plugin-proposal-class-properties": "^7.12.1",
+    "@babel/plugin-proposal-decorators": "^7.4.4",
     "@babel/preset-env": "^7.5.5",
     "@commitlint/config-conventional": "^9.1.2",
     "babel-core": "^7.0.0-bridge.0",

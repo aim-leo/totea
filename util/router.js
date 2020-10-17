@@ -3,7 +3,6 @@ const express = require("express");
 const {
   acceptObject,
   acceptFuncArray,
-  acceptObjectArray,
   acceptFunc,
   isFunc,
   isFuncArray,
@@ -146,10 +145,10 @@ class ToteaRouter {
   }
 
   _mappingAddtionalRoutes(routes) {
-    acceptObjectArray(routes);
+    acceptObject(routes);
 
-    for (const item of routes) {
-      const { method, uri, callback } = item;
+    for (const uri in routes) {
+      const { method, callback } = routes[uri];
 
       const func = this.router[method];
 

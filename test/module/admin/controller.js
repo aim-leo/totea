@@ -1,5 +1,7 @@
 const BaseController = require("../../../controller");
 
+const { Get, Route } = require("../../../decorator");
+
 class AdminController extends BaseController {
   constructor(...args) {
     super(...args);
@@ -21,6 +23,32 @@ class AdminController extends BaseController {
     return super.query({
       filters: {
         name,
+      },
+    });
+  }
+
+  @Get()
+  queryByRole({ query }) {
+    const role = query.role;
+
+    if (!role) return this.rejectRes(-1, "请输入角色类型");
+
+    return super.query({
+      filters: {
+        role,
+      },
+    });
+  }
+
+  @Route("get", "queryByPhone")
+  canBeAnyFunction({ query }) {
+    const phone = query.phone;
+
+    if (!phone) return this.rejectRes(-1, "请输入手机号码");
+
+    return super.query({
+      filters: {
+        phone,
       },
     });
   }

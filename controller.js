@@ -17,7 +17,7 @@ class ToteaController extends Util {
     super();
     this.service = service;
 
-    this.addtionalRoutes = [];
+    this.addtionalRoutes = {};
   }
 
   async insert(params) {
@@ -145,27 +145,29 @@ class ToteaController extends Util {
       interceptor,
     });
 
+    this._mappingRouteFromDecorator();
+
     return router.createRouter(this.addtionalRoutes);
   }
 
   get(uri, callback) {
-    return this.route("get", uri, callback);
+    return this.route.call(this, "get", uri, callback);
   }
 
   post(uri, callback) {
-    return this.route("post", uri, callback);
+    return this.route.call(this, "post", uri, callback);
   }
 
   delete(uri, callback) {
-    return this.route("delete", uri, callback);
+    return this.route.call(this, "delete", uri, callback);
   }
 
   put(uri, callback) {
-    return this.route("put", uri, callback);
+    return this.route.call(this, "put", uri, callback);
   }
 
   patch(uri, callback) {
-    return this.route("patch", uri, callback);
+    return this.route.call(this, "patch", uri, callback);
   }
 
   route(method, uri, callback) {
@@ -185,13 +187,23 @@ class ToteaController extends Util {
     // bind this to controller
     callback = callback.bind(this);
 
-    this.addtionalRoutes.push({
+    uri = uri[0] !== "/" ? "/" + uri : uri;
+
+    this.addtionalRoutes[uri] = {
       method,
-      uri: uri[0] !== "/" ? "/" + uri : uri,
       callback,
-    });
+    };
 
     return this;
+  }
+
+  _mappingRouteFromDecorator() {
+    if (this.routesAddedFromDecorator) {
+      for (const uri in this.routesAddedFromDecorator) {
+        const item = this.routesAddedFromDecorator[uri];
+        this.route(item.method, uri, item.callback);
+      }
+    }
   }
 }
 
