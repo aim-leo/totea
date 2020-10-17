@@ -3,8 +3,6 @@ const path = require("path");
 const merge = require("deepmerge");
 const { isString, isObject, isFunc, isArray, isNil } = require("tegund");
 
-const ToteaRouter = require("./util/router");
-
 const ToteaService = require("./service");
 const ToteaController = require("./controller");
 const createUpload = require("./upload");
@@ -162,11 +160,7 @@ class ToteaRoute {
 
     const controller = this._importController(routeName);
 
-    const router = new ToteaRouter({
-      controller,
-      middleware,
-      interceptor: this._interceptors,
-    });
+    const router = controller.createRouter(middleware, this._interceptors);
 
     // mapping form create page
     const toteaGroup = this._models[routeName].toteaGroup;

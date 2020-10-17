@@ -3,6 +3,8 @@ const express = require("express");
 const {
   acceptObject,
   acceptFuncArray,
+  acceptObjectArray,
+  acceptFunc,
   isFunc,
   isFuncArray,
 } = require("tegund");
@@ -34,16 +36,16 @@ class ToteaRouter {
     this.interceptor = interceptor;
 
     this.router = new express.Router();
-
-    return this.createRouter();
   }
 
-  createRouter() {
+  createRouter(routes) {
     this.query();
     this.insert();
     this.queryById();
     this.deleteById();
     this.updateById();
+
+    this._mappingAddtionalRoutes(routes);
 
     this._mappingInterceptor();
 
@@ -140,6 +142,22 @@ class ToteaRouter {
         throw new Error(`interceptor expected a array<function> or a function`);
       }
       this.router.use(interceptor);
+    }
+  }
+
+  _mappingAddtionalRoutes(routes) {
+    acceptObjectArray(routes);
+
+    for (const item of routes) {
+      const { method, uri, callback } = item;
+
+      const func = this.router[method];
+
+      acceptFunc(func);
+
+      this.router[method](uri, async (req, res, next) => {
+        this.controller.jsonWrite(next, res, await callback(req));
+      });
     }
   }
 }

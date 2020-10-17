@@ -5,9 +5,10 @@
  * @Last Modified time: 2019-07-29 13:56:40
  */
 
-const { isString } = require("tegund");
+const { isString, acceptString, acceptFunc } = require("tegund");
 
 const { validator } = require("./util/validator");
+const ToteaRouter = require("./util/router");
 
 const Util = require("./util");
 
@@ -15,6 +16,8 @@ class ToteaController extends Util {
   constructor(service) {
     super();
     this.service = service;
+
+    this.addtionalRoutes = [];
   }
 
   async insert(params) {
@@ -59,10 +62,6 @@ class ToteaController extends Util {
           type: "object",
           optional: true,
         },
-        query: {
-          type: "object",
-          optional: true,
-        },
         sort: {
           type: "object",
           optional: true,
@@ -81,12 +80,12 @@ class ToteaController extends Util {
       params.limit = parseInt(params.limit) || 10;
       // query
       if (params.id) {
-        const queryOne = await this.service.queryById(params.id, {
+        const result = await this.service.queryById(params.id, {
           populate,
           select: params.select,
         });
-        if (!queryOne) return this.rejectRes(1, "查询出错, 未找到该项");
-        return this.resolveRes(1, "查询成功", queryOne);
+        if (!result) return this.rejectRes(1, "查询出错, 未找到该项");
+        return this.resolveRes(1, "查询成功", result);
       }
       const count = await this.service.count({
         filters: params.filters,
@@ -95,7 +94,6 @@ class ToteaController extends Util {
         params,
         populate,
         filters: params.filters,
-        query: params.query,
         sort: params.sort,
         select: params.select,
       });
@@ -138,6 +136,62 @@ class ToteaController extends Util {
     } catch (e) {
       return this.rejectRes(-1, "修改失败", e);
     }
+  }
+
+  createRouter(middleware, interceptor) {
+    const router = new ToteaRouter({
+      controller: this,
+      middleware,
+      interceptor,
+    });
+
+    return router.createRouter(this.addtionalRoutes);
+  }
+
+  get(uri, callback) {
+    return this.route("get", uri, callback);
+  }
+
+  post(uri, callback) {
+    return this.route("post", uri, callback);
+  }
+
+  delete(uri, callback) {
+    return this.route("delete", uri, callback);
+  }
+
+  put(uri, callback) {
+    return this.route("put", uri, callback);
+  }
+
+  patch(uri, callback) {
+    return this.route("patch", uri, callback);
+  }
+
+  route(method, uri, callback) {
+    const methods = ["get", "post", "delete", "put", "patch"];
+    if (!methods.includes(method)) {
+      throw new Error(`method expected at ${methods}, but got a ${method}`);
+    }
+
+    acceptString(uri);
+
+    if (!callback) {
+      callback = this[uri];
+    }
+
+    acceptFunc(callback);
+
+    // bind this to controller
+    callback = callback.bind(this);
+
+    this.addtionalRoutes.push({
+      method,
+      uri: uri[0] !== "/" ? "/" + uri : uri,
+      callback,
+    });
+
+    return this;
   }
 }
 
