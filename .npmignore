@@ -1,0 +1,5 @@
+test
+build
+node_modules
+CHANGELOG.node_modules
+.gitignore
