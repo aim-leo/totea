@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.17.0](https://github.com/aim-leo/totea/compare/v1.16.1...v1.17.0) (2020-10-17)
+
+### Features
+
+- 🎸 add Route decorators ([0d93ee9](https://github.com/aim-leo/totea/commit/0d93ee96407198d146684efe132ebd5c3a76d74f))
+- 🎸 create router at controller ([0f5a39f](https://github.com/aim-leo/totea/commit/0f5a39f08207ef2ebbc3b4677586d74efc2e279b))
+
 ### [1.16.1](https://github.com/aim-leo/totea/compare/v1.16.0...v1.16.1) (2020-10-11)
 
 ## [1.16.0](https://github.com/aim-leo/totea/compare/v1.15.1...v1.16.0) (2020-10-11)
