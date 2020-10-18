@@ -22,8 +22,6 @@ class Server extends ToteaServer{
 
   customizeToteaRouter(toteaRoute) {
     toteaRoute.injectUpload(['image'])
-
-    toteaRoute.injectRouteFromModule()
   }
 }
 

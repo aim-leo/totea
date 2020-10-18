@@ -1,8 +1,8 @@
-const BaseController = require("../../../controller");
+const { Controller } = require("../../../controller");
 
 const { Get, Route } = require("../../../decorator");
 
-class AdminController extends BaseController {
+class AdminController extends Controller {
   constructor(...args) {
     super(...args);
 

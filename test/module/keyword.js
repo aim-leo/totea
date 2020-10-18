@@ -1,4 +1,4 @@
-const Model = require("../../model");
+const { createModel } = require("../../model");
 const types = require("../../types");
 
 const ToteaGroup = types.ToteaGroup;
@@ -6,5 +6,5 @@ const ToteaGroup = types.ToteaGroup;
 const group = new ToteaGroup(types.baseMixin);
 
 module.exports = {
-  model: new Model("keyword", group),
+  model: createModel("keyword", group),
 };

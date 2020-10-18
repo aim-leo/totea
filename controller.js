@@ -10,14 +10,31 @@ const { isString, acceptString, acceptFunc } = require("tegund");
 const { validator } = require("./util/validator");
 const ToteaRouter = require("./util/router");
 
+const { Service } = require("./service");
+
 const Util = require("./util");
 
-class ToteaController extends Util {
-  constructor(service) {
-    super();
-    this.service = service;
+const controllers = {};
 
+class ToteaController extends Util {
+  constructor(service, controllerName) {
+    super();
+
+    if (!(service instanceof Service)) {
+      throw new Error("[createController] service expected a ToteaService!");
+    }
+
+    controllerName = controllerName || service.serviceName;
+
+    this.controllerName = controllerName;
+    this.service = service;
     this.addtionalRoutes = {};
+
+    if (controllers[controllerName]) {
+      return controllers[controllerName];
+    } else {
+      controllers[controllerName] = this;
+    }
   }
 
   async insert(params) {
@@ -207,4 +224,21 @@ class ToteaController extends Util {
   }
 }
 
-module.exports = ToteaController;
+function createController(model, controllerName) {
+  // if this controller is exsist, do not create it
+  if (controllers[controllerName]) {
+    return controllers[controllerName];
+  }
+
+  return new ToteaController(model, controllerName);
+}
+
+function getControllerByName(controllerName) {
+  return controllers[controllerName];
+}
+
+module.exports = {
+  Controller: ToteaController,
+  createController,
+  getControllerByName,
+};

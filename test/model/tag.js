@@ -1,8 +1,8 @@
-const Model = require('../../model')
-const types = require('../../types')
+const { createModel } = require("../../model");
+const types = require("../../types");
 
-const ToteaGroup = types.ToteaGroup
+const ToteaGroup = types.ToteaGroup;
 
-const group = new ToteaGroup(types.baseMixin)
+const group = new ToteaGroup(types.baseMixin);
 
-module.exports = new Model('tag', group)
+module.exports = createModel("tag", group);

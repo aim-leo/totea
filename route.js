@@ -3,8 +3,8 @@ const path = require("path");
 const merge = require("deepmerge");
 const { isString, isObject, isFunc, isArray, isNil } = require("tegund");
 
-const ToteaService = require("./service");
-const ToteaController = require("./controller");
+const { Service } = require("./service");
+const { Controller } = require("./controller");
 const createUpload = require("./upload");
 
 const {
@@ -209,7 +209,7 @@ class ToteaRoute {
       throw new Error("init service expected a model");
     }
 
-    service = service || ToteaService;
+    service = service || Service;
 
     return new service(model);
   }
@@ -228,7 +228,7 @@ class ToteaRoute {
       throw new Error("init controller expected a service");
     }
 
-    controller = controller || ToteaController;
+    controller = controller || Controller;
 
     return new controller(service);
   }

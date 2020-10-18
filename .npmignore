@@ -1,5 +1,5 @@
 test
 build
 node_modules
-CHANGELOG.node_modules
+CHANGELOG.md
 .gitignore

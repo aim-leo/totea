@@ -8,6 +8,7 @@
     "test/www",
     "test/controller",
     "test/module",
+    "module",
     "./*.js"
   ],
   "env": {

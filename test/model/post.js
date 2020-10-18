@@ -1,4 +1,4 @@
-const Model = require("../../model");
+const { createModel } = require("../../model");
 const types = require("../../types");
 
 const ToteaGroup = types.ToteaGroup;
@@ -24,4 +24,4 @@ const group = new ToteaGroup({
   email: types.email(),
 });
 
-module.exports = new Model("post", group);
+module.exports = createModel("post", group);

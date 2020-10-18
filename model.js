@@ -7,10 +7,14 @@ const { toMongooseSchema } = require("./util/schema");
 
 const ToteaGroup = types.ToteaGroup;
 
+const models = {};
+
 class ToteaModel {
   static mongoUri;
 
   constructor(modelName, toteaGroup) {
+    this.modelName = modelName;
+
     this._beforeInit(modelName, toteaGroup);
   }
 
@@ -83,6 +87,11 @@ class ToteaModel {
       );
     }
 
+    // if this model is exsist, do not create it
+    if (models[modelName]) {
+      return;
+    }
+
     this.toteaGroup = toteaGroup;
     this.schema = toMongooseSchema(toteaGroup);
 
@@ -95,6 +104,9 @@ class ToteaModel {
 
     // mapping model method
     this._mappingModelMethod();
+
+    // save it
+    models[modelName] = this;
   }
 
   async _checkCreate(doc, next) {
@@ -267,4 +279,21 @@ class ToteaModel {
   }
 }
 
-module.exports = ToteaModel;
+function createModel(modelName, toteaGroup) {
+  // if this model is exsist, do not create it
+  if (models[modelName]) {
+    return models[modelName];
+  }
+
+  return new ToteaModel(modelName, toteaGroup);
+}
+
+function getModelByName(modelName) {
+  return models[modelName];
+}
+
+module.exports = {
+  Model: ToteaModel,
+  createModel,
+  getModelByName,
+};

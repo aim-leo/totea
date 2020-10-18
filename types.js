@@ -5,10 +5,10 @@ const {
   isString,
   isFunc,
   isFunction,
-  isAsyncFunction,
   isBoolean,
   isObject,
   isArray,
+  acceptObjectArray,
 } = require("tegund");
 
 const {
@@ -600,8 +600,10 @@ class ToteaGroup {
     "afterDelete",
   ];
 
-  constructor(tree) {
-    this.tree = tree;
+  constructor(...trees) {
+    acceptObjectArray(trees);
+
+    this.tree = Object.assign(...trees);
 
     this._mappingHooks();
   }
@@ -664,16 +666,16 @@ class ToteaGroup {
 
       result[key] = totea.toSchema();
 
-      // if computedFn is a pure function, assign it to mongoose schema's get
-      if (isFunction(totea._computedFn)) {
-        result[key].get = function () {
-          return totea._computedFn(this);
-        };
-      }
+      // // if computedFn is a pure function, assign it to mongoose schema's get
+      // if (isFunction(totea._computedFn)) {
+      //   result[key].get = function () {
+      //     return totea._computedFn(this);
+      //   };
+      // }
 
       // if computedFn is a async function, we need to register a hook to handle it
       // and insert this callback at start of all hooks
-      if (isAsyncFunction(totea._computedFn)) {
+      if (isFunc(totea._computedFn)) {
         this.beforeCreateOrUpdate(async (doc, ...args) => {
           doc[key] = await totea._computedFn(doc, ...args);
         }, false);

@@ -90,7 +90,19 @@ function getValidatorMessage(type, field = "", expected, actual) {
   return message;
 }
 
+function validate(json, schema) {
+  try {
+    const validError = validator.validate(json, schema);
+    if (validError && validError.length > 0) {
+      return validError[0].message;
+    }
+  } catch (e) {
+    return "校验失败：参数错误";
+  }
+}
+
 module.exports = {
   validator,
   getValidatorMessage,
+  validate,
 };

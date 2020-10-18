@@ -3,7 +3,7 @@ const path = require("path");
 const createError = require("http-errors");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
-const { isNumber, acceptString, acceptNumber } = require("tegund");
+const { acceptString, acceptNumber } = require("tegund");
 
 const express = require("./express");
 
@@ -149,7 +149,7 @@ class ToteaServer {
   setMongoUri(uri) {
     acceptString(uri, "uri expected a string type");
 
-    const Model = require("./model");
+    const { Model } = require("./model");
 
     Model.mongoUri = uri;
   }

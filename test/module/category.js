@@ -1,3 +1,3 @@
-const categoryModule = require("../../module/category");
+const createModule = require("../../module/category");
 
-module.exports = categoryModule;
+module.exports = createModule();
