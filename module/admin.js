@@ -6,19 +6,13 @@ const types = require("../types");
 const { Controller: ToteaController } = require("../controller");
 const { getServiceByName } = require("../service");
 
-const { Post } = require("../decorator");
+const { Post, Body } = require("../decorator");
 
 class Controller extends ToteaController {
   @Post()
-  async login({ body }) {
+  @Body(types.accountMixin)
+  async login(body, header, query) {
     try {
-      const loginDto = new types.ToteaGroup(types.accountMixin);
-      const errorMessage = await loginDto.validateCreate(body);
-
-      if (errorMessage) {
-        return this.rejectRes(-1, errorMessage);
-      }
-
       // check user exist
       const user = await this.service.queryOne({
         filters: {
@@ -39,15 +33,74 @@ class Controller extends ToteaController {
         return this.rejectRes(-1, "登录失败， 签名失败");
       }
 
-      return this.resolveRes(1, "登录成功", { user, token: token.sign });
+      return this.resolveRes(1, "登录成功", { user, token: token.token });
     } catch (e) {
       console.error(e);
       return this.rejectRes(-1, "登录失败，帐号或者密码错误");
     }
   }
+
+  @Post()
+  async loginOut({ headers }) {
+    try {
+      const loginDto = new types.ToteaGroup({
+        token: types.text("签名").length(32).required(),
+      });
+      const errorMessage = await loginDto.validateCreate(headers);
+
+      if (errorMessage) {
+        return this.rejectRes(-1, errorMessage);
+      }
+
+      // find the token, then delete
+      const tokenService = getServiceByName("token");
+      const expireSuccess = await tokenService.expire(headers.token);
+
+      if (!expireSuccess) {
+        return this.rejectRes(-1, "登出失败");
+      }
+
+      return this.resolveRes(1, "登出成功");
+    } catch (e) {
+      console.error(e);
+      return this.rejectRes(-1, "登出失败");
+    }
+  }
 }
 
-function createModule({ moduleName = "admin", tokenModuleName = "token" }) {
+async function checkLoginmiddleware(req, res, next) {
+  try {
+    // get token from req
+    const token = req.headers.token || req.query.token;
+
+    if (!token || typeof token !== "string" || token.length !== 32) {
+      return res.json({ code: -401, message: "登录过期，请重新登录!" });
+    }
+
+    // find the token, then delete
+    const tokenService = getServiceByName("token");
+    const validateRes = await tokenService.validate(token);
+
+    if (!validateRes) {
+      return res.json({ code: -401, message: "登录过期，请重新登录!" });
+    }
+
+    req.headers.token = token;
+    req.query.token = token;
+    req.body.token = token;
+
+    req.headers.userId = validateRes.userId;
+    req.query.userId = validateRes.userId;
+    req.body.userId = validateRes.userId;
+
+    next();
+  } catch (e) {
+    console.error(e);
+    return res.json({ code: -401, message: "登录校验失败!" });
+  }
+}
+
+function createModule({ moduleName = "admin" }) {
   if (isNil(moduleName) || !isString(moduleName)) {
     throw new Error("[CategoryModuleFactory] module name is expected a string");
   }
@@ -60,6 +113,9 @@ function createModule({ moduleName = "admin", tokenModuleName = "token" }) {
       })
     ),
     controller: Controller,
+    middleware: {
+      checkLogin: checkLoginmiddleware,
+    },
   };
 }
 

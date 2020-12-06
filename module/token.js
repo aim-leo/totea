@@ -11,9 +11,12 @@ const { Controller: ToteaController } = require("../controller");
 const { Get } = require("../decorator");
 
 const toteaGroup = new types.ToteaGroup({
-  sign: types.shortText("签名").computed((doc) => {
-    return md5(`${doc.userId}_${new Date().getTime()}_${randomString()}`);
-  }),
+  token: types
+    .text("签名")
+    .length(32)
+    .computed((doc) => {
+      return md5(`${doc.userId}_${new Date().getTime()}_${randomString()}`);
+    }),
   userId: types.id("用户ID").required(),
   exprire: types.int("有效时间").default(60 * 60 * 3),
   createTime: types.createTime(),
@@ -39,12 +42,12 @@ class Controller extends ToteaController {
 
   @Get()
   async validate({ query }) {
-    const { sign } = query;
+    const { token } = query;
     try {
-      if (!sign) {
-        return this.rejectRes(-1, "失败,请输入sign");
+      if (!token) {
+        return this.rejectRes(-1, "失败,请输入token");
       }
-      const res = await this.service.validate(sign);
+      const res = await this.service.validate(token);
       if (!res) {
         return this.rejectRes(-1, "fail");
       }
@@ -79,18 +82,18 @@ class Service extends ToteaService {
     }
   }
 
-  async expire(sign) {
+  async expire(token) {
     // check exsist
-    const token = await this.queryOne({
+    const tokenRes = await this.queryOne({
       filters: {
-        sign,
+        token,
       },
     });
 
-    if (!token) return false;
+    if (!tokenRes) return false;
 
     // remove token
-    const res = await this.service.deleteById(token._id);
+    const res = await this.deleteById(tokenRes._id);
     if (!res || res.deletedCount === 0) {
       return false;
     }
@@ -99,27 +102,27 @@ class Service extends ToteaService {
 
   async expireByUserId(userId) {
     // check exsist
-    const token = await this.queryOne({
+    const tokenRes = await this.queryOne({
       filters: {
         userId,
       },
     });
 
-    if (!token) return false;
+    if (!tokenRes) return false;
 
     // remove token
-    const res = await this.service.deleteById(token._id);
+    const res = await this.deleteById(tokenRes._id);
     if (!res || res.deletedCount === 0) {
       return false;
     }
     return true;
   }
 
-  async validate(sign) {
+  async validate(token) {
     // check exsist
     const result = await this.queryOne({
       filters: {
-        sign,
+        token,
       },
     });
 

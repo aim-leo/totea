@@ -15,7 +15,7 @@ class ToteaModel {
   constructor(modelName, toteaGroup) {
     this.modelName = modelName;
 
-    this._beforeInit(modelName, toteaGroup);
+    this._initModel(modelName, toteaGroup);
   }
 
   async exsist(params) {
@@ -75,7 +75,7 @@ class ToteaModel {
     });
   }
 
-  _beforeInit(modelName, toteaGroup) {
+  _initModel(modelName, toteaGroup) {
     acceptString(
       modelName,
       `modelName expected a string, but get a ${modelName}`

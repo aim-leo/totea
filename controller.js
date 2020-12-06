@@ -156,6 +156,11 @@ class ToteaController extends Util {
   }
 
   createRouter(middleware, interceptor) {
+    middleware = this.mergeMiddleware(
+      middleware,
+      this.middlewareAddedFromDecorator
+    );
+
     const router = new ToteaRouter({
       controller: this,
       middleware,
@@ -212,6 +217,32 @@ class ToteaController extends Util {
     };
 
     return this;
+  }
+
+  assignMiddleware(funtionName, callback) {
+    if (!this.middlewareAddedFromDecorator)
+      this.middlewareAddedFromDecorator = {};
+    if (!this.middlewareAddedFromDecorator[funtionName])
+      this.middlewareAddedFromDecorator[funtionName] = [];
+
+    this.middlewareAddedFromDecorator[funtionName].push(callback);
+  }
+
+  mergeMiddleware(...middlewares) {
+    const result = {};
+    for (const item of middlewares) {
+      if (typeof item !== "object") continue;
+
+      for (const key in item) {
+        if (!Array.isArray(item[key])) continue;
+
+        if (!Array.isArray(result[key])) result[key] = [];
+
+        result[key].push(...item[key]);
+      }
+    }
+
+    return result;
   }
 
   _mappingRouteFromDecorator() {

@@ -10,6 +10,12 @@ const {
 
 const { parseRequestParams } = require("../middleware");
 
+function getFuntionName(func) {
+  acceptFunc(func);
+
+  return func.name.split(" ").slice(-1)[0];
+}
+
 class ToteaRouter {
   constructor({ controller, middleware, interceptor }) {
     acceptObject(
@@ -154,9 +160,15 @@ class ToteaRouter {
 
       acceptFunc(func);
 
-      this.router[method](uri, async (req, res, next) => {
-        this.controller.jsonWrite(next, res, await callback(req));
-      });
+      this.router[method](
+        uri,
+        ...this._spreadMiddleware(getFuntionName(callback)),
+        async (req, res, next) => {
+          let paramters = [req];
+          if (Array.isArray(req.__args)) paramters = req.__args;
+          this.controller.jsonWrite(next, res, await callback(...paramters));
+        }
+      );
     }
   }
 }
