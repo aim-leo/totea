@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.18.0](https://github.com/aim-leo/totea/compare/v1.17.1...v1.18.0) (2021-02-23)
+
+### Features
+
+- 🎸 add paramters decorator ([5ea6ab8](https://github.com/aim-leo/totea/commit/5ea6ab813c5b0a9ef8dc6e1bc0aa413dcfd8a1fd))
+- 🎸 save model | service | controller when instance ([fb42336](https://github.com/aim-leo/totea/commit/fb4233693dff32bb1ccf85f83684f7348a869e71))
+- add Query decorator ([126e90e](https://github.com/aim-leo/totea/commit/126e90e5fcfa5ec879f5b6377d850a2676a68497))
+
 ### [1.17.1](https://github.com/aim-leo/totea/compare/v1.17.0...v1.17.1) (2020-10-17)
 
 ## [1.17.0](https://github.com/aim-leo/totea/compare/v1.16.1...v1.17.0) (2020-10-17)
