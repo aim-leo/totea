@@ -9,6 +9,7 @@ const types = require("../types");
 const { Service: ToteaService } = require("../service");
 const { Controller: ToteaController } = require("../controller");
 const { Get } = require("../decorator");
+const { Totea } = require("../types");
 
 const toteaGroup = new types.ToteaGroup({
   token: types
@@ -41,6 +42,8 @@ class Controller extends ToteaController {
   }
 
   @Get()
+  // @Query('sign', new Totea().string())
+  // @Query({ sign: new Totea().string(), age: new Totea().number()  })
   async validate({ query }) {
     const { token } = query;
     try {

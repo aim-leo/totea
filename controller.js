@@ -255,13 +255,13 @@ class ToteaController extends Util {
   }
 }
 
-function createController(model, controllerName) {
+function createController(service, controllerName) {
   // if this controller is exsist, do not create it
   if (controllers[controllerName]) {
     return controllers[controllerName];
   }
 
-  return new ToteaController(model, controllerName);
+  return new ToteaController(service, controllerName);
 }
 
 function getControllerByName(controllerName) {
