@@ -1,6 +1,6 @@
 {
   "name": "totea",
-  "version": "1.19.0",
+  "version": "1.19.1",
   "description": "Express CRUD for RESTful APIs",
   "author": "aimleo",
   "license": "MIT",
