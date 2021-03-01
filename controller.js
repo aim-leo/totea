@@ -165,6 +165,7 @@ class ToteaController extends Util {
       controller: this,
       middleware,
       interceptor,
+      forbidRoute: this.forbidRoute,
     });
 
     this._mappingRouteFromDecorator();
@@ -226,6 +227,26 @@ class ToteaController extends Util {
       this.middlewareAddedFromDecorator[funtionName] = [];
 
     this.middlewareAddedFromDecorator[funtionName].push(callback);
+  }
+
+  forbidAllDefaultRoute() {
+    this.forbidDefaultRoute([
+      "query",
+      "insert",
+      "queryById",
+      "deleteById",
+      "updateById",
+    ]);
+  }
+
+  forbidDefaultRoute(key) {
+    if (!this.forbidRoute) this.forbidRoute = [];
+
+    if (!Array.isArray(key)) {
+      key = [key];
+    }
+
+    this.forbidRoute.push(...key);
   }
 
   mergeMiddleware(...middlewares) {

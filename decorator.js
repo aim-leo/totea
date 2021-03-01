@@ -73,6 +73,16 @@ PARAMETERS.map((item) => {
   parameters[item] = (uri) => Parameter(item, uri);
 });
 
+function Middleware(callback) {
+  if (typeof callback !== "function") {
+    throw new Error(`middlare expected at function, but got a ${callback}`);
+  }
+
+  return function (target, key) {
+    target.assignMiddleware(key, callback);
+  };
+}
+
 module.exports = {
   // route decorator
   Route,
@@ -81,4 +91,6 @@ module.exports = {
   // params validate decorator
   Parameter,
   ...parameters,
+
+  Middleware,
 };

@@ -165,8 +165,8 @@ class Totea {
     return this;
   }
 
-  required() {
-    this._required = true;
+  required(flag = true) {
+    this._required = flag;
 
     return this;
   }
@@ -634,6 +634,18 @@ class ToteaGroup {
 
   get updateFormSchema() {
     return this.toUpdateFormShema();
+  }
+
+  getRule(...keys) {
+    const obj = {};
+    for (const key of keys) {
+      if (!(key in this.tree)) {
+        throw new Error("can not find this rule: " + key);
+      }
+      obj[key] = this.tree[key];
+    }
+
+    return obj;
   }
 
   beforeCreateOrUpdate(...args) {

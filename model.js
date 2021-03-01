@@ -169,12 +169,12 @@ class ToteaModel {
     for (const key in refConfig) {
       if (!doc[key]) continue;
 
-      const { ref, refFilter = {}, isArray } = refConfig[key];
+      const { ref, refFilter, isArray } = refConfig[key];
       const model = mongoose.models[ref];
 
       if (!model) throw new Error(`新增失败， ${ref}表不存在`);
 
-      const { filter, msg } = refFilter;
+      const { filter, msg } = refFilter || {};
 
       const ids = isArray ? doc[key] : [doc[key]];
 

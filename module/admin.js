@@ -9,6 +9,18 @@ const { getServiceByName } = require("../service");
 const { Post, Body } = require("../decorator");
 
 class Controller extends ToteaController {
+  constructor(...args) {
+    super(...args);
+
+    this.assignMiddleware("global", (req, res, next) => {
+      console.log("global middleware");
+
+      next();
+    });
+
+    this.forbid("query");
+  }
+
   @Post()
   @Body(types.accountMixin)
   async login(body, header, query) {

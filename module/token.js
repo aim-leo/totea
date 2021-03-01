@@ -9,7 +9,6 @@ const types = require("../types");
 const { Service: ToteaService } = require("../service");
 const { Controller: ToteaController } = require("../controller");
 const { Get } = require("../decorator");
-const { Totea } = require("../types");
 
 const toteaGroup = new types.ToteaGroup({
   token: types

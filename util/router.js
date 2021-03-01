@@ -17,7 +17,7 @@ function getFuntionName(func) {
 }
 
 class ToteaRouter {
-  constructor({ controller, middleware, interceptor }) {
+  constructor({ controller, middleware, interceptor, forbidRoute }) {
     acceptObject(
       controller,
       `controller expected a object, but get a ${controller}`
@@ -40,6 +40,8 @@ class ToteaRouter {
     this.middleware = middleware;
     this.interceptor = interceptor;
 
+    this.forbidRoute = forbidRoute || [];
+
     this.router = new express.Router();
   }
 
@@ -58,6 +60,8 @@ class ToteaRouter {
   }
 
   query() {
+    if (this.forbidRoute.includes("query")) return;
+
     this.router.get(
       "/",
       parseRequestParams,
@@ -73,6 +77,8 @@ class ToteaRouter {
   }
 
   insert() {
+    if (this.forbidRoute.includes("insert")) return;
+
     this.router.post(
       "/",
       ...this._spreadMiddleware("insert"),
@@ -87,6 +93,8 @@ class ToteaRouter {
   }
 
   queryById() {
+    if (this.forbidRoute.includes("queryById")) return;
+
     this.router.get(
       "/:id",
       ...this._spreadMiddleware("queryById"),
@@ -101,6 +109,8 @@ class ToteaRouter {
   }
 
   deleteById() {
+    if (this.forbidRoute.includes("deleteById")) return;
+
     this.router.delete(
       "/:id",
       ...this._spreadMiddleware("deleteById"),
@@ -115,6 +125,8 @@ class ToteaRouter {
   }
 
   updateById() {
+    if (this.forbidRoute.includes("updateById")) return;
+
     this.router.patch(
       "/:id",
       ...this._spreadMiddleware("updateById"),
@@ -129,11 +141,12 @@ class ToteaRouter {
   }
 
   _spreadMiddleware(type) {
+    const globalMiddleware = this.middleware.global || [];
     const m = this.middleware[type] || [];
     if (isFunc(m)) {
-      return [m];
+      return [...globalMiddleware, m];
     } else if (isFuncArray(m)) {
-      return m;
+      return [...globalMiddleware, ...m];
     }
 
     throw new Error(
