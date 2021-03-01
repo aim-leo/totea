@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.19.0](https://github.com/aim-leo/totea/compare/v1.18.3...v1.19.0) (2021-03-01)
+
+### Features
+
+- enable set required to false ([d6accf6](https://github.com/aim-leo/totea/commit/d6accf681a02ea40af773dbc52e1f53816e72943))
+
 ### [1.18.3](https://github.com/aim-leo/totea/compare/v1.18.2...v1.18.3) (2021-02-24)
 
 ### [1.18.2](https://github.com/aim-leo/totea/compare/v1.18.1...v1.18.2) (2021-02-24)
