@@ -689,7 +689,9 @@ class ToteaGroup {
       // and insert this callback at start of all hooks
       if (isFunc(totea._computedFn)) {
         this.beforeCreateOrUpdate(async (doc, ...args) => {
-          doc[key] = await totea._computedFn(doc, ...args);
+          const res = await totea._computedFn(doc, ...args);
+
+          if (res !== undefined) doc[key] = res;
         }, false);
       }
     }
